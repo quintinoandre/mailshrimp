@@ -8,6 +8,22 @@ function getAccounts(_req: Request, res: Response, _next: any) {
 	res.json(accounts);
 }
 
+function getAccount({ params }: Request, res: Response, _next: any) {
+	try {
+		const { id } = params;
+
+		const index = accounts.findIndex((item) => item.id === parseInt(id));
+
+		if (index === -1) return res.status(404).end(); //! Not Found
+
+		return res.json(accounts[index]);
+	} catch (error) {
+		console.log(error);
+
+		return res.status(400).end(); //! Bad Request
+	}
+}
+
 function addAccount({ body }: Request, res: Response, _next: any) {
 	try {
 		const newAccount = body as IAccount;
@@ -22,4 +38,4 @@ function addAccount({ body }: Request, res: Response, _next: any) {
 	}
 }
 
-export { getAccounts, addAccount };
+export { getAccounts, getAccount, addAccount };

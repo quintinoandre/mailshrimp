@@ -1,11 +1,13 @@
 import { Router } from 'express';
 
-import { getAccounts, addAccount } from '@controllers/accounts';
+import { getAccounts, getAccount, addAccount } from '@controllers/accounts';
 
 const router = Router();
 
-router.get('/', getAccounts);
+router.get('/accounts/', getAccounts);
 
-router.post('/', addAccount);
+router.get('/accounts/:id', getAccount);
+
+router.post('/accounts/', addAccount);
 
 export default router;

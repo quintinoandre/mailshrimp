@@ -27,8 +27,9 @@
 				"argsIgnorePattern": "_"
 			}
 		],
-    "@typescript-eslint/no-explicit-any": "off",
+		"@typescript-eslint/no-explicit-any": "off",
 		"import/no-unresolved": "off",
+		"radix": "off",
 		"import-helpers/order-imports": [
 			"warn",
 			{
