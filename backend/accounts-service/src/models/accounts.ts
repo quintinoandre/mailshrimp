@@ -12,10 +12,15 @@ interface IAccount {
 
 const accountSchema = Joi.object({
 	id: Joi.number().integer().min(1),
-	name: Joi.string().alphanum().min(3).max(150).required(),
+	name: Joi.string().min(3).max(150).required(),
 	email: Joi.string().email().min(8).max(150).required(),
-	password: Joi.string().alphanum().min(6).max(50).required(),
+	password: Joi.string().min(6).max(50).required(),
 	status: Joi.number().integer().min(100).max(400),
 });
 
-export { IAccount, accountSchema };
+const loginSchema = Joi.object({
+	email: Joi.string().email().min(8).max(150).required(),
+	password: Joi.string().min(6).max(50).required(),
+});
+
+export { IAccount, accountSchema, loginSchema };

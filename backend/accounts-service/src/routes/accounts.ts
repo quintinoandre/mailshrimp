@@ -1,10 +1,23 @@
 import { Router, Request, Response } from 'express';
+import Joi from 'joi';
 
-import { getAccounts, getAccount, addAccount } from '@controllers/accounts';
-import { accountSchema } from '@models/accounts';
+import {
+	getAccounts,
+	getAccount,
+	setAccount,
+	addAccount,
+	loginAccount,
+	logoutAccount,
+} from '@controllers/accounts';
+import { accountSchema, loginSchema } from '@models/accounts';
 
-function validateAccount({ body }: Request, res: Response, next: any) {
-	const { error } = accountSchema.validate(body);
+function validateSchema(
+	schema: Joi.ObjectSchema<any>,
+	{ body }: Request,
+	res: Response,
+	next: any
+) {
+	const { error } = schema.validate(body);
 
 	if (error === undefined) return next();
 
@@ -17,12 +30,26 @@ function validateAccount({ body }: Request, res: Response, next: any) {
 	return res.status(422).end(); //! Unprocessable Entity
 }
 
+function validateAccount(req: Request, res: Response, next: any) {
+	return validateSchema(accountSchema, req, res, next);
+}
+
+function validateLogin(req: Request, res: Response, next: any) {
+	return validateSchema(loginSchema, req, res, next);
+}
+
 const router = Router();
 
 router.get('/accounts/', getAccounts);
 
 router.get('/accounts/:id', getAccount);
 
+router.patch('/accounts/:id', validateAccount, setAccount);
+
 router.post('/accounts/', validateAccount, addAccount);
+
+router.post('/accounts/login', validateLogin, loginAccount);
+
+router.post('/accounts/logout', logoutAccount);
 
 export default router;
