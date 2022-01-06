@@ -10,9 +10,11 @@ function getAccounts(_req: Request, res: Response, _next: any) {
 
 function getAccount({ params }: Request, res: Response, _next: any) {
 	try {
-		const { id } = params;
+		const id = parseInt(params.id);
 
-		const index = accounts.findIndex((item) => item.id === parseInt(id));
+		if (!id) throw new Error('id is invalid format!');
+
+		const index = accounts.findIndex((item) => item.id === id);
 
 		if (index === -1) return res.status(404).end(); //! Not Found
 

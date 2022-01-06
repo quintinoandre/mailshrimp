@@ -20,7 +20,8 @@
 			"@controllers/*": ["./src/controllers/*"],
 			"@models/*": ["./src/models/*"],
 			"@routes/*": ["./src/routes/*"]
-    }
+		}
 	},
-	"include": ["src/**/*"]
+	"include": ["src/**/*"],
+	"exclude": ["__tests__"]
 }

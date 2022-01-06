@@ -18,9 +18,11 @@
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
+		"@types/joi": "^17.2.3",
 		"dotenv-safe": "^8.2.0",
 		"express": "^4.17.2",
-		"helmet": "^5.0.1"
+		"helmet": "^5.0.1",
+		"joi": "^17.5.0"
 	},
 	"devDependencies": {
 		"@babel/cli": "^7.16.7",

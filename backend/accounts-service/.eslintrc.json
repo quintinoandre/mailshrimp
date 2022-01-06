@@ -33,6 +33,7 @@
 		"import/no-extraneous-dependencies": "off",
 		"import/prefer-default-export": "off",
 		"import/extensions": "off",
+    "no-shadow": "off",
 		"import-helpers/order-imports": [
 			"warn",
 			{
