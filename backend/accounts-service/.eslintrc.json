@@ -30,6 +30,9 @@
 		"@typescript-eslint/no-explicit-any": "off",
 		"import/no-unresolved": "off",
 		"radix": "off",
+		"import/no-extraneous-dependencies": "off",
+		"import/prefer-default-export": "off",
+		"import/extensions": "off",
 		"import-helpers/order-imports": [
 			"warn",
 			{
