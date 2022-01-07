@@ -70,6 +70,8 @@ async function setAccount(
 
 		const accountParams = body as IAccount;
 
+		accountParams.password = hashPassword(accountParams.password);
+
 		const updatedAccount = await set(id, accountParams);
 
 		delete updatedAccount.get({ plain: true }).password;
