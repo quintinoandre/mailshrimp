@@ -13,7 +13,8 @@
 		"lint": "eslint ./",
 		"lintFix": "eslint ./ --fix",
 		"format": "prettier --write \"**/*.{js,jsx,json,md,ts,tsx}\"",
-		"test": "jest"
+		"test": "jest",
+    "createdb": "npx sequelize-cli db:create"
 	},
 	"author": "",
 	"license": "ISC",

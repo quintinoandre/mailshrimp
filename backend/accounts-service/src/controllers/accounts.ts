@@ -1,11 +1,22 @@
 import { Request, Response } from 'express';
 
+import AccountRepository, { AccountModel } from '@models/accountModel';
 import { IAccount } from '@models/accounts';
 
 const accounts: IAccount[] = [];
 
-function getAccounts(_req: Request, res: Response, _next: any) {
-	res.json(accounts);
+async function getAccounts(_req: Request, res: Response, _next: any) {
+	const accounts = await AccountRepository.findAll<AccountModel>();
+
+	res.json(
+		accounts.map((item) => {
+			const account = item;
+
+			delete account.password;
+
+			return account;
+		})
+	);
 }
 
 function getAccount({ params }: Request, res: Response, _next: any) {
