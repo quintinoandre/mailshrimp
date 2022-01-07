@@ -8,7 +8,11 @@ import {
 	loginAccount,
 	logoutAccount,
 } from '@controllers/accounts';
-import { validateAccount, validateLogin } from '@routes/middlewares';
+import {
+	validateAccount,
+	validateUpdateAccount,
+	validateLogin,
+} from '@routes/middlewares';
 
 const router = Router();
 
@@ -16,7 +20,7 @@ router.get('/accounts/', getAccounts);
 
 router.get('/accounts/:id', getAccount);
 
-router.patch('/accounts/:id', validateAccount, setAccount);
+router.patch('/accounts/:id', validateUpdateAccount, setAccount);
 
 router.post('/accounts/', validateAccount, addAccount);
 

@@ -1,35 +1,38 @@
 import { Request, Response } from 'express';
+import { hashPassword } from 'src/auth';
 
-import AccountRepository, { AccountModel } from '@models/accountModel';
+import { findAll, findById, add, set } from '@models/accountModel';
 import { IAccount } from '@models/accounts';
 
 const accounts: IAccount[] = [];
 
 async function getAccounts(_req: Request, res: Response, _next: any) {
-	const accounts = await AccountRepository.findAll<AccountModel>();
+	const accounts = await findAll();
 
 	res.json(
 		accounts.map((item) => {
 			const account = item;
 
-			delete account.password;
+			delete account.get({ plain: true }).password;
 
 			return account;
 		})
 	);
 }
 
-function getAccount({ params }: Request, res: Response, _next: any) {
+async function getAccount({ params }: Request, res: Response, _next: any) {
 	try {
 		const id = parseInt(params.id);
 
 		if (!id) throw new Error('id is in invalid format!');
 
-		const index = accounts.findIndex((item) => item.id === id);
+		const account = await findById(id);
 
-		if (index === -1) return res.status(404).end(); //! Not Found
+		if (!account) return res.status(404).end(); //! Not Found
 
-		return res.json(accounts[index]);
+		delete account.get({ plain: true }).password;
+
+		return res.json(account);
 	} catch (error) {
 		console.log(error);
 
@@ -37,13 +40,17 @@ function getAccount({ params }: Request, res: Response, _next: any) {
 	}
 }
 
-function addAccount({ body }: Request, res: Response, _next: any) {
+async function addAccount({ body }: Request, res: Response, _next: any) {
 	try {
 		const newAccount = body as IAccount;
 
-		accounts.push(newAccount);
+		newAccount.password = hashPassword(newAccount.password);
 
-		res.status(201).json(newAccount); //! Created
+		const result = await add(newAccount);
+
+		delete result.get({ plain: true }).password;
+
+		res.status(201).json(result); //! Created
 	} catch (error) {
 		console.log(error);
 
@@ -51,7 +58,11 @@ function addAccount({ body }: Request, res: Response, _next: any) {
 	}
 }
 
-function setAccount({ body, params }: Request, res: Response, _next: any) {
+async function setAccount(
+	{ body, params }: Request,
+	res: Response,
+	_next: any
+) {
 	try {
 		const id = parseInt(params.id);
 
@@ -59,20 +70,11 @@ function setAccount({ body, params }: Request, res: Response, _next: any) {
 
 		const accountParams = body as IAccount;
 
-		const index = accounts.findIndex((item) => item.id === id);
+		const updatedAccount = await set(id, accountParams);
 
-		if (index === -1) return res.status(404).end(); //! Not Found
+		delete updatedAccount.get({ plain: true }).password;
 
-		const originalAccount = accounts[index];
-
-		if (accountParams.name) originalAccount.name = accountParams.name;
-
-		if (accountParams.password)
-			originalAccount.password = accountParams.password;
-
-		accounts[index] = originalAccount;
-
-		return res.status(200).json(originalAccount); //* OK
+		return res.status(200).json(updatedAccount); //* OK
 	} catch (error) {
 		console.log(error);
 
