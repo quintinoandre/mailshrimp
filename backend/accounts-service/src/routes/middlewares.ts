@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import Joi from 'joi';
 
-import { accountSchema, loginSchema } from '@models/accounts';
+import { accountSchema, loginSchema } from '@models/accountSchemas';
 
 function validateSchema(
 	schema: Joi.ObjectSchema<any>,
