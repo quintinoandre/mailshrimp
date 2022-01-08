@@ -29,7 +29,7 @@ async function getAccount({ params }: Request, res: Response, _next: any) {
 	try {
 		const id = parseInt(params.id);
 
-		if (!id) throw new Error('id is in invalid format!');
+		if (!id) return res.status(400).end(); //! Bad Request
 
 		const account = await findById(id);
 
@@ -71,17 +71,23 @@ async function setAccount(
 	try {
 		const id = parseInt(params.id);
 
-		if (!id) throw new Error('id is in invalid format!');
+		if (!id) return res.status(400).end(); //! Bad Request
 
 		const accountParams = body as IAccount;
 
-		accountParams.password = hashPassword(accountParams.password);
+		const { password } = accountParams;
+
+		if (password) accountParams.password = hashPassword(password);
 
 		const updatedAccount = await set(id, accountParams);
 
-		delete updatedAccount.get({ plain: true }).password;
+		if (updatedAccount) {
+			delete updatedAccount.get({ plain: true }).password;
 
-		return res.status(200).json(updatedAccount); //* OK
+			return res.status(200).json(updatedAccount); //* OK
+		}
+
+		return res.status(404).end(); //! Not Found
 	} catch (error) {
 		console.log(error);
 

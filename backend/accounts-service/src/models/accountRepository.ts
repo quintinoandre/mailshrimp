@@ -40,7 +40,7 @@ async function set(id: number, account: IAccount) {
 		return originalAccount;
 	}
 
-	throw Error('Account not found!');
+	return null;
 }
 
 function remove(id: number) {

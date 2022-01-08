@@ -5,7 +5,7 @@ import app from '../src/app';
 import { add, removeByEmail } from '../src/models/accountRepository';
 import { IAccount } from '../src/models/accounts';
 
-const TEST_EMAIL = 'jest@jest.com';
+const TEST_EMAIL = 'jest@accounts.auth.com';
 const HASH_TEST_PASSWORD =
 	'$2a$10$Ive59EREl/VkatAZYl9qF.MI5u3Db4vV/bK/pkHXgxHNUrl.CEFMu';
 const TEST_PASSWORD = '123456';
