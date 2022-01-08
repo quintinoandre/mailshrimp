@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import Joi from 'joi';
+import { verify } from 'src/auth';
 
 import {
 	accountSchema,
@@ -38,4 +39,24 @@ function validateLogin(req: Request, res: Response, next: any) {
 	return validateSchema(loginSchema, req, res, next);
 }
 
-export { validateAccount, validateUpdateAccount, validateLogin };
+async function validateAuth({ headers }: Request, res: Response, next: any) {
+	try {
+		const token = headers['x-access-token'] as string;
+
+		if (!token) return res.status(401).end(); //! Unauthorized
+
+		const payload = await verify(token);
+
+		if (!payload) return res.status(401).end(); //! Unauthorized
+
+		res.locals.payload = payload;
+
+		return next();
+	} catch (error) {
+		console.log(`validateAuth: ${error}`);
+
+		return res.status(401).end(); //! Unauthorized
+	}
+}
+
+export { validateAccount, validateUpdateAccount, validateLogin, validateAuth };

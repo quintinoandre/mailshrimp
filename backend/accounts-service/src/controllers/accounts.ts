@@ -1,10 +1,8 @@
 import { Request, Response } from 'express';
-import { hashPassword } from 'src/auth';
+import { comparePassword, hashPassword, sign } from 'src/auth';
 
-import { findAll, findById, add, set } from '@models/accountModel';
+import { findAll, findByEmail, findById, add, set } from '@models/accountModel';
 import { IAccount } from '@models/accounts';
-
-const accounts: IAccount[] = [];
 
 async function getAccounts(_req: Request, res: Response, _next: any) {
 	const accounts = await findAll();
@@ -84,21 +82,29 @@ async function setAccount(
 	}
 }
 
-function loginAccount({ body }: Request, res: Response, _next: any) {
+async function loginAccount({ body }: Request, res: Response, _next: any) {
 	try {
 		const loginParams = body as IAccount;
 
-		const index = accounts.findIndex(
-			(item) =>
-				item.email === loginParams.email &&
-				item.password === loginParams.password
-		);
+		const { email, password: loginPassword } = loginParams;
 
-		if (index === -1) return res.status(401).end(); //! Unauthorized
+		const account = await findByEmail(email);
 
-		return res.json({ auth: true, token: {} });
+		const { id, password: accountPassword } = account;
+
+		if (account) {
+			const isValid = comparePassword(loginPassword, accountPassword);
+
+			if (isValid) {
+				const token = sign(id!);
+
+				return res.json({ auth: true, token });
+			}
+		}
+
+		return res.status(401).end(); //! Unauthorized
 	} catch (error) {
-		console.log(error);
+		console.log(`loginAccount: ${error}`);
 
 		return res.status(400).end(); //! Bad Request
 	}
