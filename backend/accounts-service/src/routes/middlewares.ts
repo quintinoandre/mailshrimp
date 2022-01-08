@@ -1,12 +1,13 @@
 import { Request, Response } from 'express';
 import Joi from 'joi';
-import { verify } from 'src/auth';
 
 import {
 	accountSchema,
 	accountUpdateSchema,
 	loginSchema,
 } from '@models/accountSchemas';
+
+import { verify } from '../auth';
 
 function validateSchema(
 	schema: Joi.ObjectSchema<any>,
@@ -27,15 +28,15 @@ function validateSchema(
 	return res.status(422).end(); //! Unprocessable Entity
 }
 
-function validateAccount(req: Request, res: Response, next: any) {
+function validateAccountSchema(req: Request, res: Response, next: any) {
 	return validateSchema(accountSchema, req, res, next);
 }
 
-function validateUpdateAccount(req: Request, res: Response, next: any) {
+function validateUpdateAccountSchema(req: Request, res: Response, next: any) {
 	return validateSchema(accountUpdateSchema, req, res, next);
 }
 
-function validateLogin(req: Request, res: Response, next: any) {
+function validateLoginSchema(req: Request, res: Response, next: any) {
 	return validateSchema(loginSchema, req, res, next);
 }
 
@@ -59,4 +60,9 @@ async function validateAuth({ headers }: Request, res: Response, next: any) {
 	}
 }
 
-export { validateAccount, validateUpdateAccount, validateLogin, validateAuth };
+export {
+	validateAccountSchema,
+	validateUpdateAccountSchema,
+	validateLoginSchema,
+	validateAuth,
+};

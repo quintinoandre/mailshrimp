@@ -28,6 +28,8 @@ export default {
 	moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, {
 		prefix: '<rootDir>',
 	}),
+	// The paths to modules that run some code to configure or set up the testing environment before each test
+	setupFiles: ['dotenv/config'],
 	// All imported modules in your tests should be mocked automatically
 	// automock: false,
 
@@ -118,9 +120,6 @@ export default {
 
 	// Allows you to use a custom runner instead of Jest's default test runner
 	// runner: "jest-runner",
-
-	// The paths to modules that run some code to configure or set up the testing environment before each test
-	// setupFiles: [],
 
 	// A list of paths to modules that run some code to configure or set up the testing framework before each test
 	// setupFilesAfterEnv: [],

@@ -1,8 +1,15 @@
 import { Request, Response } from 'express';
-import { comparePassword, hashPassword, sign } from 'src/auth';
 
-import { findAll, findByEmail, findById, add, set } from '@models/accountModel';
+import {
+	findAll,
+	findByEmail,
+	findById,
+	add,
+	set,
+} from '@models/accountRepository';
 import { IAccount } from '@models/accounts';
+
+import { comparePassword, hashPassword, sign } from '../auth';
 
 async function getAccounts(_req: Request, res: Response, _next: any) {
 	const accounts = await findAll();

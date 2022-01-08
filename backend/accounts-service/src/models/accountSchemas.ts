@@ -6,7 +6,7 @@ const accountSchema = Joi.object({
 	email: Joi.string().email().min(8).max(150).required(),
 	password: Joi.string().min(6).max(50).required(),
 	status: Joi.number().integer().min(100).max(400),
-	domain: Joi.string().min(5).max(150),
+	domain: Joi.string().min(5).max(150).required(),
 });
 
 const accountUpdateSchema = Joi.object({
