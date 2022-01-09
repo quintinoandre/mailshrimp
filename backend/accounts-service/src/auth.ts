@@ -1,10 +1,14 @@
 import bcrypt from 'bcryptjs';
 import fs from 'fs';
 import jwt from 'jsonwebtoken';
+import path from 'path';
 
 import authCommons, { Token } from '@ms-commons/api/auth';
 
-const privateKey = fs.readFileSync('./keys/private.key', 'utf8');
+const privateKey = fs.readFileSync(
+	path.resolve(__dirname, '../keys/private.key'),
+	'utf8'
+);
 
 const { JWT_EXPIRES } = process.env;
 

@@ -6,8 +6,11 @@ import {
 	findById,
 	add,
 	set,
+	remove,
 } from '@models/accountRepository';
 import { IAccount } from '@models/accounts';
+import { Token } from '@ms-commons/api/auth';
+import { getToken } from '@ms-commons/api/controllers/controller';
 
 import { comparePassword, hashPassword, sign } from '../auth';
 
@@ -30,6 +33,10 @@ async function getAccount({ params }: Request, res: Response, _next: any) {
 		const id = parseInt(params.id);
 
 		if (!id) return res.status(400).end(); //! Bad Request
+
+		const token = getToken(res) as Token;
+
+		if (id !== token.accountId) return res.status(403).end(); //! Forbidden
 
 		const account = await findById(id);
 
@@ -72,6 +79,10 @@ async function setAccount(
 		const id = parseInt(params.id);
 
 		if (!id) return res.status(400).end(); //! Bad Request
+
+		const token = getToken(res) as Token;
+
+		if (id !== token.accountId) return res.status(403).end(); //! Forbidden
 
 		const accountParams = body as IAccount;
 
@@ -127,6 +138,26 @@ function logoutAccount(req: Request, res: Response, _next: any) {
 	res.json({ auth: false, token: null });
 }
 
+async function deleteAccount({ params }: Request, res: Response, _next: any) {
+	try {
+		const id = parseInt(params.id);
+
+		if (!id) return res.status(400).end(); //! Bad Request
+
+		const token = getToken(res) as Token;
+
+		if (id !== token.accountId) return res.status(403).end(); //! Forbidden
+
+		await remove(id);
+
+		return res.status(200).end(); // * OK
+	} catch (error) {
+		console.log(`deleteAccount: ${error}`);
+
+		return res.status(400).end(); //! Bad Request
+	}
+}
+
 export {
 	getAccounts,
 	getAccount,
@@ -134,4 +165,5 @@ export {
 	setAccount,
 	loginAccount,
 	logoutAccount,
+	deleteAccount,
 };

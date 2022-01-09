@@ -17,9 +17,9 @@
 		"moduleResolution": "node",
 		"baseUrl": ".",
 		"paths": {
-			"@controllers/*": ["./src/controllers/*"],
-			"@models/*": ["./src/models/*"],
-			"@routes/*": ["./src/routes/*"],
+			"@controllers/*": ["./src/controllers/*","../accounts-service/src/controllers/*"],
+			"@models/*": ["./src/models/*","../accounts-service/src/models/*"],
+			"@routes/*": ["./src/routes/*","../accounts-service/src/routes/*"],
 			"@ms-commons/*": ["../__commons__/src/*"]
 		}
 	},

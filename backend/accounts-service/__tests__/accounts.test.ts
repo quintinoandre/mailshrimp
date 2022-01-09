@@ -1,6 +1,8 @@
 import { STATUS_CODES } from 'http';
 import request from 'supertest';
 
+import { describe, expect, it, beforeAll, afterAll } from '@jest/globals';
+
 import app from '../src/app';
 import { sign } from '../src/auth';
 import { add, removeByEmail } from '../src/models/accountRepository';
@@ -98,7 +100,7 @@ describe('Testing routes of accounts', () => {
 		expect(result.status).toEqual(400);
 	});
 
-	it(`PATCH /accounts/:id - should return statusCode 404 (${STATUS_CODES[404]})`, async () => {
+	it(`PATCH /accounts/:id - should return statusCode 403 (${STATUS_CODES[403]})`, async () => {
 		const payload = {
 			name: 'Daniel Castro',
 		};
@@ -108,7 +110,7 @@ describe('Testing routes of accounts', () => {
 			.send(payload)
 			.set('x-access-token', jwt);
 
-		expect(result.status).toEqual(404);
+		expect(result.status).toEqual(403);
 	});
 
 	it('GET /accounts/:id - should return statusCode 200 (OK)', async () => {
@@ -120,12 +122,12 @@ describe('Testing routes of accounts', () => {
 		expect(result.body.id).toBe(testId);
 	});
 
-	it(`GET /accounts/:id - should return statusCode 404 (${STATUS_CODES[404]})`, async () => {
+	it(`GET /accounts/:id - should return statusCode 403 (${STATUS_CODES[403]})`, async () => {
 		const result = await request(app)
 			.get('/accounts/-1')
 			.set('x-access-token', jwt);
 
-		expect(result.status).toEqual(404);
+		expect(result.status).toEqual(403);
 	});
 
 	it(`GET /accounts/:id - should return statusCode 400 (${STATUS_CODES[400]})`, async () => {
@@ -134,5 +136,21 @@ describe('Testing routes of accounts', () => {
 			.set('x-access-token', jwt);
 
 		expect(result.status).toEqual(400);
+	});
+
+	it(`DELETE /accounts/:id - should return statusCode 200 (${STATUS_CODES[200]})`, async () => {
+		const result = await request(app)
+			.delete(`/accounts/${testId}`)
+			.set('x-access-token', jwt);
+
+		expect(result.status).toEqual(200);
+	});
+
+	it(`DELETE /accounts/:id - should return statusCode 403 (${STATUS_CODES[403]})`, async () => {
+		const result = await request(app)
+			.delete(`/accounts/-1`)
+			.set('x-access-token', jwt);
+
+		expect(result.status).toEqual(403);
 	});
 });

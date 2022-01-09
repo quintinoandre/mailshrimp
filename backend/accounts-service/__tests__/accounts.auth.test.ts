@@ -1,7 +1,10 @@
 import { STATUS_CODES } from 'http';
 import request from 'supertest';
 
+import { describe, expect, it, beforeAll, afterAll } from '@jest/globals';
+
 import app from '../src/app';
+import { sign } from '../src/auth';
 import { add, removeByEmail } from '../src/models/accountRepository';
 import { IAccount } from '../src/models/accounts';
 
@@ -9,6 +12,8 @@ const TEST_EMAIL = 'jest@accounts.auth.com';
 const HASH_TEST_PASSWORD =
 	'$2a$10$Ive59EREl/VkatAZYl9qF.MI5u3Db4vV/bK/pkHXgxHNUrl.CEFMu';
 const TEST_PASSWORD = '123456';
+let jwt = '';
+let testAccountId = 0;
 
 beforeAll(async () => {
 	const testAccount: IAccount = {
@@ -18,7 +23,11 @@ beforeAll(async () => {
 		domain: 'jest.com',
 	};
 
-	await add(testAccount);
+	const result = await add(testAccount);
+
+	testAccountId = result.id;
+
+	jwt = sign(testAccountId);
 });
 
 afterAll(async () => {
@@ -59,7 +68,9 @@ describe('Testing routes of authentication', () => {
 	});
 
 	it(`POST /accounts/logout - should return statusCode 200 (${STATUS_CODES[200]})`, async () => {
-		const result = await request(app).post('/accounts/logout');
+		const result = await request(app)
+			.post('/accounts/logout')
+			.set('x-access-token', jwt);
 
 		expect(result.status).toEqual(200);
 	});
