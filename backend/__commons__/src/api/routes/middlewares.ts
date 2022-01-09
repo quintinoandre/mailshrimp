@@ -42,4 +42,4 @@ async function validateAuth({ headers }: Request, res: Response, next: any) {
 	}
 }
 
-export { validateSchema, validateAuth };
+export default { validateSchema, validateAuth };
