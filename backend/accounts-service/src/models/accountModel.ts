@@ -1,6 +1,7 @@
 import Sequelize, { Model, Optional } from 'sequelize';
 
-import database from '../db';
+import database from '@ms-commons/data/db';
+
 import { IAccount } from './accounts';
 
 type IAccountCreationAttributes = Optional<IAccount, 'id'>;

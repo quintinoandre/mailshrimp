@@ -1,9 +1,10 @@
 import bcrypt from 'bcryptjs';
 import fs from 'fs';
-import jwt, { VerifyOptions } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
+
+import authCommons, { Token } from '@ms-commons/api/auth';
 
 const privateKey = fs.readFileSync('./keys/private.key', 'utf8');
-const publicKey = fs.readFileSync('./keys/public.key', 'utf8');
 
 const { JWT_EXPIRES } = process.env;
 
@@ -17,8 +18,6 @@ function comparePassword(password: string, hashPassword: string) {
 	return bcrypt.compareSync(password, hashPassword);
 }
 
-type Token = { accountId: number };
-
 function sign(accountId: number) {
 	const token: Token = { accountId };
 
@@ -29,17 +28,7 @@ function sign(accountId: number) {
 }
 
 async function verify(token: string) {
-	try {
-		const tokenDecoded: Token = (await jwt.verify(token, publicKey, {
-			algorithm: [JWT_ALGORITHM],
-		} as VerifyOptions)) as Token;
-
-		return { accountId: tokenDecoded.accountId };
-	} catch (error) {
-		console.log(`verify: ${error}`);
-
-		return null;
-	}
+	return authCommons.verify(token);
 }
 
 export { hashPassword, comparePassword, sign, verify };
