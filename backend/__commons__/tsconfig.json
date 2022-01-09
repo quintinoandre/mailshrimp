@@ -5,7 +5,7 @@
 		"lib": ["es6"],
 		"allowJs": true,
 		"outDir": "./dist",
-    "rootDirs": ["./src/","../__commons__/src"],
+		"rootDir": "./src",
 		"removeComments": true,
 		"typeRoots": ["./node_modules/@types", "./src/@types"],
 		"esModuleInterop": true,
@@ -19,8 +19,7 @@
 		"paths": {
 			"@controllers/*": ["./src/controllers/*"],
 			"@models/*": ["./src/models/*"],
-			"@routes/*": ["./src/routes/*"],
-			"@ms-commons/*": ["../__commons__/src/*"]
+			"@routes/*": ["./src/routes/*"]
 		}
 	},
 	"include": ["src/**/*"],

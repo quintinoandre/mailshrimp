@@ -18,7 +18,6 @@ module.exports = {
 					'@controllers': './src/controllers',
 					'@models': './src/models',
 					'@routes': './src/routes',
-					'@ms-commons': '../__commons__/src',
 				},
 			},
 		],
