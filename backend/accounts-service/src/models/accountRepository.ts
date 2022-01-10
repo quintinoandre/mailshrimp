@@ -20,24 +20,28 @@ function add(account: IAccount) {
 }
 
 async function set(id: number, account: IAccount) {
+	const newAccount = account;
+
 	const originalAccount = await accountModel.findByPk<IAccountModel>(id);
 
 	if (originalAccount) {
-		if (account.name && account.name !== originalAccount.name)
-			originalAccount.name = account.name;
+		if (newAccount.name && newAccount.name !== originalAccount.name)
+			originalAccount.name = newAccount.name;
 
-		if (account.password && account.password !== originalAccount.password)
-			originalAccount.password = account.password;
+		if (newAccount.password && newAccount.password !== originalAccount.password)
+			originalAccount.password = newAccount.password;
 
-		if (account.domain && account.domain !== originalAccount.domain)
-			originalAccount.domain = account.domain;
+		if (newAccount.domain && newAccount.domain !== originalAccount.domain)
+			originalAccount.domain = newAccount.domain;
 
-		if (account.status && account.status !== originalAccount.status)
-			originalAccount.status = account.status;
+		if (newAccount.status && newAccount.status !== originalAccount.status)
+			originalAccount.status = newAccount.status;
 
-		await originalAccount.save();
+		const result = await originalAccount.save();
 
-		return originalAccount;
+		newAccount.id = result.id;
+
+		return newAccount;
 	}
 
 	return null;

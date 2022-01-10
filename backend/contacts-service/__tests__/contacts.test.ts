@@ -88,7 +88,7 @@ describe('Testing routes of contacts', () => {
 
 	it(`GET /contacts/:id - should return statusCode 404 (${STATUS_CODES[404]})`, async () => {
 		const result = await request(app)
-			.get(`/contacts/-1`)
+			.get('/contacts/-1')
 			.set('x-access-token', jwt);
 
 		expect(result.status).toEqual(404);
@@ -96,7 +96,7 @@ describe('Testing routes of contacts', () => {
 
 	it(`GET /contacts/:id - should return statusCode 400 (${STATUS_CODES[400]})`, async () => {
 		const result = await request(app)
-			.get(`/contacts/abc`)
+			.get('/contacts/abc')
 			.set('x-access-token', jwt);
 
 		expect(result.status).toEqual(400);
@@ -116,7 +116,7 @@ describe('Testing routes of contacts', () => {
 		} as IContact;
 
 		const result = await request(app)
-			.post(`/contacts/`)
+			.post('/contacts/')
 			.set('x-access-token', jwt)
 			.send(testContact);
 
@@ -128,7 +128,7 @@ describe('Testing routes of contacts', () => {
 		const payload = { street: 'jest2' };
 
 		const result = await request(app)
-			.post(`/contacts/`)
+			.post('/contacts/')
 			.set('x-access-token', jwt)
 			.send(payload);
 
@@ -142,7 +142,7 @@ describe('Testing routes of contacts', () => {
 			phone: '00351123456789',
 		} as IContact;
 
-		const result = await request(app).post(`/contacts/`).send(payload);
+		const result = await request(app).post('/contacts/').send(payload);
 
 		expect(result.status).toEqual(401);
 	});
@@ -155,7 +155,62 @@ describe('Testing routes of contacts', () => {
 		} as IContact;
 
 		const result = await request(app)
-			.post(`/contacts/`)
+			.post('/contacts/')
+			.set('x-access-token', jwt)
+			.send(payload);
+
+		expect(result.status).toEqual(400);
+	});
+
+	it(`PATCH /contacts/:id - should return statusCode 200 (${STATUS_CODES[200]})`, async () => {
+		const payload = { name: 'Luiz' };
+
+		const result = await request(app)
+			.patch(`/contacts/${testContactId}`)
+			.set('x-access-token', jwt)
+			.send(payload);
+
+		expect(result.status).toEqual(200);
+		expect(result.body.name).toEqual('Luiz');
+	});
+
+	it(`PATCH /contacts/:id - should return statusCode 401 (${STATUS_CODES[401]})`, async () => {
+		const payload = { name: 'Luiz' };
+
+		const result = await request(app)
+			.patch(`/contacts/${testContactId}`)
+			.send(payload);
+
+		expect(result.status).toEqual(401);
+	});
+
+	it(`PATCH /contacts/:id - should return statusCode 422 (${STATUS_CODES[422]})`, async () => {
+		const payload = { street: 'Luiz' };
+
+		const result = await request(app)
+			.patch(`/contacts/${testContactId}`)
+			.set('x-access-token', jwt)
+			.send(payload);
+
+		expect(result.status).toEqual(422);
+	});
+
+	it(`PATCH /contacts/:id - should return statusCode 404 (${STATUS_CODES[404]})`, async () => {
+		const payload = { name: 'Luiz' };
+
+		const result = await request(app)
+			.patch('/contacts/-1')
+			.set('x-access-token', jwt)
+			.send(payload);
+
+		expect(result.status).toEqual(404);
+	});
+
+	it(`PATCH /contacts/:id - should return statusCode 400 (${STATUS_CODES[400]})`, async () => {
+		const payload = { name: 'Luiz' };
+
+		const result = await request(app)
+			.patch('/contacts/abc')
 			.set('x-access-token', jwt)
 			.send(payload);
 

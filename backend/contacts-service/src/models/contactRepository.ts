@@ -23,6 +23,33 @@ async function add(contact: IContact, accountId: number) {
 	return newContact;
 }
 
+async function set(contactId: number, contact: IContact, accountId: number) {
+	const newContact = contact;
+
+	const originalContact = await contactModel.findOne({
+		where: { id: contactId, accountId },
+	});
+
+	if (originalContact) {
+		if (newContact.name && newContact.name !== originalContact.name)
+			originalContact.name = newContact.name;
+
+		if (newContact.phone && newContact.phone !== originalContact.phone)
+			originalContact.phone = newContact.phone;
+
+		if (newContact.status && newContact.status !== originalContact.status)
+			originalContact.status = newContact.status;
+
+		const result = await originalContact.save();
+
+		newContact.id = result.id;
+
+		return newContact;
+	}
+
+	return null;
+}
+
 function removeById(contactId: number, accountId: number) {
 	return contactModel.destroy({ where: { id: contactId, accountId } });
 }
@@ -31,4 +58,4 @@ function removeByEmail(email: string, accountId: number) {
 	return contactModel.destroy({ where: { email, accountId } });
 }
 
-export { findAll, findById, add, removeById, removeByEmail };
+export { findAll, findById, add, set, removeById, removeByEmail };

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-import { add, findAll, findById } from '@models/contactRepository';
+import { add, findAll, findById, set } from '@models/contactRepository';
 import { IContact } from '@models/contacts';
 import { Token } from '@ms-commons/api/auth';
 import { getToken } from '@ms-commons/api/controllers/controller';
@@ -55,4 +55,30 @@ async function addContact({ body }: Request, res: Response, _next: any) {
 	}
 }
 
-export { getContacts, getContact, addContact };
+async function setContact(
+	{ body, params }: Request,
+	res: Response,
+	_next: any
+) {
+	try {
+		const id = parseInt(params.id);
+
+		if (!id) return res.status(400).end(); //! Bad Request
+
+		const token = getToken(res) as Token;
+
+		const contact = body as IContact;
+
+		const result = await set(id, contact, token.accountId);
+
+		if (!result) return res.status(404).end(); //! Not Found
+
+		return res.json(result); //* OK
+	} catch (error) {
+		console.error(`setContact: ${error}`);
+
+		return res.status(400).end(); //! Bad Request
+	}
+}
+
+export { getContacts, getContact, addContact, setContact };
