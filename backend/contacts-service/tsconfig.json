@@ -17,9 +17,12 @@
 		"moduleResolution": "node",
 		"baseUrl": ".",
 		"paths": {
-			"@controllers/*": ["./src/controllers/*","../accounts-service/src/controllers/*"],
-			"@models/*": ["./src/models/*","../accounts-service/src/models/*"],
-			"@routes/*": ["./src/routes/*","../accounts-service/src/routes/*"],
+			"@controllers/*": [
+				"../accounts-service/src/controllers/*",
+				"./src/controllers/*"
+			],
+			"@models/*": ["../accounts-service/src/models/*", "./src/models/*"],
+			"@routes/*": ["../accounts-service/src/routes/*", "./src/routes/*"],
 			"@ms-commons/*": ["../__commons__/src/*"]
 		}
 	},

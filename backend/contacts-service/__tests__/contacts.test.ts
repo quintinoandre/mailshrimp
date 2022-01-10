@@ -9,6 +9,7 @@ import { add, removeByEmail } from '../src/models/contactRepository';
 import { IContact } from '../src/models/contacts';
 
 const TEST_EMAIL = 'jest@accounts.com';
+const TEST_EMAIL2 = 'jest2@accounts.com';
 const TEST_PASSWORD = '123456';
 let testAccountId: number = 0;
 let testContactId: number = 0;
@@ -48,6 +49,8 @@ beforeAll(async () => {
 
 afterAll(async () => {
 	await removeByEmail(TEST_EMAIL, testAccountId);
+
+	await removeByEmail(TEST_EMAIL2, testAccountId);
 
 	await request(accountsApp)
 		.delete(`/accounts/${testAccountId}`)
@@ -103,5 +106,59 @@ describe('Testing routes of contacts', () => {
 		const result = await request(app).get(`/contacts/${testContactId}`);
 
 		expect(result.status).toEqual(401);
+	});
+
+	it(`POST /contacts/ - should return statusCode 201 (${STATUS_CODES[201]})`, async () => {
+		const testContact = {
+			name: 'jest2',
+			email: TEST_EMAIL2,
+			phone: '00351123456789',
+		} as IContact;
+
+		const result = await request(app)
+			.post(`/contacts/`)
+			.set('x-access-token', jwt)
+			.send(testContact);
+
+		expect(result.status).toEqual(201);
+		expect(result.body.id).toBeTruthy();
+	});
+
+	it(`POST /contacts/ - should return statusCode 422 (${STATUS_CODES[422]})`, async () => {
+		const payload = { street: 'jest2' };
+
+		const result = await request(app)
+			.post(`/contacts/`)
+			.set('x-access-token', jwt)
+			.send(payload);
+
+		expect(result.status).toEqual(422);
+	});
+
+	it(`POST /contacts/ - should return statusCode 401 (${STATUS_CODES[401]})`, async () => {
+		const payload = {
+			name: 'jest2',
+			email: TEST_EMAIL2,
+			phone: '00351123456789',
+		} as IContact;
+
+		const result = await request(app).post(`/contacts/`).send(payload);
+
+		expect(result.status).toEqual(401);
+	});
+
+	it(`POST /contacts/ - should return statusCode 400 (${STATUS_CODES[400]})`, async () => {
+		const payload = {
+			name: 'jest3',
+			email: TEST_EMAIL,
+			phone: '00351123456789',
+		} as IContact;
+
+		const result = await request(app)
+			.post(`/contacts/`)
+			.set('x-access-token', jwt)
+			.send(payload);
+
+		expect(result.status).toEqual(400);
 	});
 });

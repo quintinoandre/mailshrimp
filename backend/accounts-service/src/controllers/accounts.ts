@@ -21,7 +21,7 @@ async function getAccounts(_req: Request, res: Response, _next: any) {
 		accounts.map((item) => {
 			const account = item;
 
-			delete account.get({ plain: true }).password;
+			account.password = '';
 
 			return account;
 		})
@@ -42,7 +42,7 @@ async function getAccount({ params }: Request, res: Response, _next: any) {
 
 		if (!account) return res.status(404).end(); //! Not Found
 
-		delete account.get({ plain: true }).password;
+		account.password = '';
 
 		return res.json(account); //* OK
 	} catch (error) {
@@ -60,7 +60,7 @@ async function addAccount({ body }: Request, res: Response, _next: any) {
 
 		const result = await add(newAccount);
 
-		delete result.get({ plain: true }).password;
+		result.password = '';
 
 		res.status(201).json(result); //* Created
 	} catch (error) {
@@ -93,7 +93,7 @@ async function setAccount(
 		const updatedAccount = await set(id, accountParams);
 
 		if (updatedAccount) {
-			delete updatedAccount.get({ plain: true }).password;
+			updatedAccount.password = '';
 
 			return res.status(200).json(updatedAccount); //* OK
 		}

@@ -5,7 +5,7 @@
 		"lib": ["es6"],
 		"allowJs": true,
 		"outDir": "./dist",
-    "rootDirs": ["./src/","../__commons__/src"],
+		"rootDirs": ["./src/", "../__commons__/src"],
 		"removeComments": true,
 		"typeRoots": ["./node_modules/@types", "./src/@types"],
 		"esModuleInterop": true,
