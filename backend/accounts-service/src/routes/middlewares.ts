@@ -7,22 +7,25 @@ import {
 } from '@models/accountSchemas';
 import { Token } from '@ms-commons/api/auth';
 import { getToken } from '@ms-commons/api/controllers/controller';
-import commonsMiddleware from '@ms-commons/api/routes/middlewares';
+import {
+	validateSchema,
+	validateAuth,
+} from '@ms-commons/api/routes/middlewares';
 
 function validateAccountSchema(req: Request, res: Response, next: any) {
-	return commonsMiddleware.validateSchema(accountSchema, req, res, next);
+	return validateSchema(accountSchema, req, res, next);
 }
 
 function validateUpdateAccountSchema(req: Request, res: Response, next: any) {
-	return commonsMiddleware.validateSchema(accountUpdateSchema, req, res, next);
+	return validateSchema(accountUpdateSchema, req, res, next);
 }
 
 function validateLoginSchema(req: Request, res: Response, next: any) {
-	return commonsMiddleware.validateSchema(loginSchema, req, res, next);
+	return validateSchema(loginSchema, req, res, next);
 }
 
 async function validateAuthentication(req: Request, res: Response, next: any) {
-	return commonsMiddleware.validateAuth(req, res, next);
+	return validateAuth(req, res, next);
 }
 
 function validateAuthorization({ params }: Request, res: Response, next: any) {

@@ -14,6 +14,6 @@ import app from './app';
 
 		console.log(`Running on port ${PORT}!`);
 	} catch (error) {
-		console.log(`${error}`);
+		console.error(`${error}`);
 	}
 })();

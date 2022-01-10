@@ -36,10 +36,10 @@ async function validateAuth({ headers }: Request, res: Response, next: any) {
 
 		return next();
 	} catch (error) {
-		console.log(`validateAuth: ${error}`);
+		console.error(`validateAuth: ${error}`);
 
 		return res.status(401).end(); //! Unauthorized
 	}
 }
 
-export default { validateSchema, validateAuth };
+export { validateSchema, validateAuth };

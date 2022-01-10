@@ -19,7 +19,7 @@ async function verify(token: string) {
 
 		return { accountId: tokenDecoded.accountId };
 	} catch (error) {
-		console.log(`verify: ${error}`);
+		console.error(`verify: ${error}`);
 
 		return null;
 	}

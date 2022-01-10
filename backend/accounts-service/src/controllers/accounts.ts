@@ -44,9 +44,9 @@ async function getAccount({ params }: Request, res: Response, _next: any) {
 
 		delete account.get({ plain: true }).password;
 
-		return res.json(account);
+		return res.json(account); //* OK
 	} catch (error) {
-		console.log(error);
+		console.error(`getAccount: ${error}`);
 
 		return res.status(400).end(); //! Bad Request
 	}
@@ -62,9 +62,9 @@ async function addAccount({ body }: Request, res: Response, _next: any) {
 
 		delete result.get({ plain: true }).password;
 
-		res.status(201).json(result); //! Created
+		res.status(201).json(result); //* Created
 	} catch (error) {
-		console.log(error);
+		console.error(`addAccount: ${error}`);
 
 		res.status(400).end(); //! Bad Request
 	}
@@ -100,7 +100,7 @@ async function setAccount(
 
 		return res.status(404).end(); //! Not Found
 	} catch (error) {
-		console.log(error);
+		console.error(`setAccount: ${error}`);
 
 		return res.status(400).end(); //! Bad Request
 	}
@@ -122,20 +122,20 @@ async function loginAccount({ body }: Request, res: Response, _next: any) {
 			if (isValid) {
 				const token = sign(id!);
 
-				return res.json({ auth: true, token });
+				return res.json({ auth: true, token }); //* OK
 			}
 		}
 
 		return res.status(401).end(); //! Unauthorized
 	} catch (error) {
-		console.log(`loginAccount: ${error}`);
+		console.error(`loginAccount: ${error}`);
 
 		return res.status(400).end(); //! Bad Request
 	}
 }
 
 function logoutAccount(req: Request, res: Response, _next: any) {
-	res.json({ auth: false, token: null });
+	res.json({ auth: false, token: null }); //* OK
 }
 
 async function deleteAccount({ params }: Request, res: Response, _next: any) {
@@ -152,7 +152,7 @@ async function deleteAccount({ params }: Request, res: Response, _next: any) {
 
 		return res.status(200).end(); // * OK
 	} catch (error) {
-		console.log(`deleteAccount: ${error}`);
+		console.error(`deleteAccount: ${error}`);
 
 		return res.status(400).end(); //! Bad Request
 	}

@@ -26,13 +26,14 @@ beforeAll(async () => {
 
 	const result = await add(testAccount);
 
-	testId = result.id!;
+	testId = result.id;
 
-	jwt = sign(testId!);
+	jwt = sign(testId);
 });
 
 afterAll(async () => {
 	await removeByEmail(TEST_EMAIL);
+
 	await removeByEmail(TEST_EMAIL2);
 });
 
