@@ -1,10 +1,5 @@
 import React from 'react';
-import {
-	BrowserRouter as Router,
-	Routes as Switch,
-	Route,
-	Link,
-} from 'react-router-dom';
+import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
 
 import Login from './pages/public/Login';
 import SignUp from './pages/public/SignUp';
@@ -68,11 +63,21 @@ export default function Routes() {
 		<Router>
 			<div>
 				<Switch>
-					<Route exact path="/" element={<Home />} />
-					<Route path="/contacts" element={<Contacts />} />
-					<Route path="/messages" element={<Messages />} />
-					<Route path="/login" element={<Login />} />
-					<Route path="/signup" element={<SignUp />} />
+					<Route exact path="/">
+						<Home />
+					</Route>
+					<Route path="/contacts">
+						<Contacts />
+					</Route>
+					<Route path="/messages">
+						<Messages />
+					</Route>
+					<Route path="/login">
+						<Login />
+					</Route>
+					<Route path="/signup">
+						<SignUp />
+					</Route>
 				</Switch>
 			</div>
 		</Router>

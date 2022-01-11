@@ -1,13 +1,44 @@
 import React from 'react';
 import { Button, Form, Container, Row, Col } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
 
 import Logo from '../../../assets/logo.png';
+import api from '../../../services/api';
+import { login } from '../../../services/auth';
 import { BoxContent, BoxForm } from './styles';
 
 class Login extends React.Component {
+	constructor(props) {
+		super(props);
+		this.state = {
+			email: '',
+			password: '',
+			error: '',
+		};
+	}
+
 	handleLogin = async (event) => {
 		event.preventDefault();
+
+		const { email, password } = this.state;
+
+		if (!email || !password)
+			this.setState({ error: 'Enter all the fields to access' });
+		else {
+			try {
+				const response = await api.post('accounts/login', { email, password });
+
+				login(response.data.token);
+
+				this.props.history.push('/');
+			} catch (error) {
+				console.error(error);
+
+				this.setState({
+					error: 'An error occurred while trying to login.',
+				});
+			}
+		}
 	};
 
 	render() {
@@ -22,15 +53,25 @@ class Login extends React.Component {
 							<h2>Login</h2>
 							<p>Enter your data to authenticate:</p>
 							<Form onSubmit={this.handleLogin}>
+								{this.state.error && this.renderError()}
 								<Form.Group controlId="emailGroup" className="mb-3">
 									<Form.Label>E-mail</Form.Label>
-									<Form.Control type="email" placeholder="Enter your e-mail" />
+									<Form.Control
+										type="email"
+										placeholder="Enter your e-mail"
+										onChange={(event) =>
+											this.setState({ email: event.target.value })
+										}
+									/>
 								</Form.Group>
 								<Form.Group controlId="passwordGroup" className="mb-3">
 									<Form.Label>Password</Form.Label>
 									<Form.Control
 										type="password"
 										placeholder="Enter your password"
+										onChange={(event) =>
+											this.setState({ password: event.target.value })
+										}
 									/>
 								</Form.Group>
 								<div className="d-grid gap-2">
@@ -53,4 +94,4 @@ class Login extends React.Component {
 	}
 }
 
-export default Login;
+export default withRouter(Login);

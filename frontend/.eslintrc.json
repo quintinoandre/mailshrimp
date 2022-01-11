@@ -22,11 +22,20 @@
 		"space-before-function-paren": "off",
 		"react/jsx-filename-extension": "off",
 		"no-unused-vars": "warn",
-    "react/prefer-stateless-function": "off",
-    "class-methods-use-this": ["error", { "enforceForClassFields": false }],
-    "import/prefer-default-export": "off",
-    "react/destructuring-assignment": "off",
-    "import-helpers/order-imports": [
+		"react/prefer-stateless-function": "off",
+		"class-methods-use-this": ["error", { "enforceForClassFields": false }],
+		"import/prefer-default-export": "off",
+		"react/destructuring-assignment": "off",
+		"no-param-reassign": "off",
+		"no-console": "off",
+		"react/prop-types": "off",
+		"no-unused-vars": [
+			"warn",
+			{
+				"argsIgnorePattern": "_"
+			}
+		],
+		"import-helpers/order-imports": [
 			"warn",
 			{
 				"newlinesBetween": "always",

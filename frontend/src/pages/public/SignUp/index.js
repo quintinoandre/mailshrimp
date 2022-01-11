@@ -1,8 +1,9 @@
 import React from 'react';
 import { Container, Form, Button, Row, Col, Alert } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
 
 import Logo from '../../../assets/logo.png';
+import api from '../../../services/api';
 import { BoxContent, BoxForm } from './styles';
 
 class SignUp extends React.Component {
@@ -25,6 +26,19 @@ class SignUp extends React.Component {
 
 		if (!name || !email || !domain || !password)
 			this.setState({ error: 'Enter all the fields to register' });
+		else {
+			try {
+				await api.post('accounts', { name, email, password, domain });
+
+				this.props.history.push('/login');
+			} catch (error) {
+				console.error(error);
+
+				this.setState({
+					error: 'An error occurred while creating the account.',
+				});
+			}
+		}
 	};
 
 	renderError = () => {
@@ -105,4 +119,4 @@ class SignUp extends React.Component {
 	}
 }
 
-export default SignUp;
+export default withRouter(SignUp);
