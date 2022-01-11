@@ -18,17 +18,20 @@ class SignUp extends React.Component {
 		};
 	}
 
-	async handleSignUp(event) {
+	handleSignUp = async (event) => {
 		event.preventDefault();
 
 		const { name, email, password, domain, isLoading } = this.state;
-	}
 
-	renderError() {
+		if (!name || !email || !domain || !password)
+			this.setState({ error: 'Enter all the fields to register' });
+	};
+
+	renderError = () => {
 		const { error } = this.state;
 
 		return <Alert variant="danger">{error}</Alert>;
-	}
+	};
 
 	render() {
 		return (
