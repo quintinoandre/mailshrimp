@@ -21,14 +21,14 @@
 		"prettier/prettier": "error",
 		"space-before-function-paren": "off",
 		"react/jsx-filename-extension": "off",
-		"no-unused-vars": "warn",
 		"react/prefer-stateless-function": "off",
-		"class-methods-use-this": ["error", { "enforceForClassFields": false }],
+		"class-methods-use-this": "off",
 		"import/prefer-default-export": "off",
 		"react/destructuring-assignment": "off",
 		"no-param-reassign": "off",
 		"no-console": "off",
 		"react/prop-types": "off",
+    "react/jsx-props-no-spreading":"off",
 		"no-unused-vars": [
 			"warn",
 			{

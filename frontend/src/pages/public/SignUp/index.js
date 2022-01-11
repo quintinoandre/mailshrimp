@@ -4,7 +4,7 @@ import { Link, withRouter } from 'react-router-dom';
 
 import Logo from '../../../assets/logo.png';
 import api from '../../../services/api';
-import { BoxContent, BoxForm } from './styles';
+import { BoxContent, BoxForm } from '../../../shared/styles';
 
 class SignUp extends React.Component {
 	constructor(props) {

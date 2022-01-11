@@ -5,7 +5,7 @@ import { Link, withRouter } from 'react-router-dom';
 import Logo from '../../../assets/logo.png';
 import api from '../../../services/api';
 import { login } from '../../../services/auth';
-import { BoxContent, BoxForm } from './styles';
+import { BoxContent, BoxForm } from '../../../shared/styles';
 
 class Login extends React.Component {
 	constructor(props) {

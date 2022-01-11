@@ -11,4 +11,8 @@ const BoxForm = styled.div`
 	border-top: solid 3px #f31300;
 `;
 
-export { BoxContent, BoxForm };
+const PageContent = styled.div`
+	padding: 30px 0;
+`;
+
+export { BoxContent, BoxForm, PageContent };
