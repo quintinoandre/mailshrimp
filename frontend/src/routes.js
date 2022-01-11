@@ -7,6 +7,7 @@ import {
 } from 'react-router-dom';
 
 import Login from './pages/public/Login';
+import SignUp from './pages/public/SignUp';
 
 function Home() {
 	return (
@@ -33,14 +34,6 @@ function Contacts() {
 					<Link to="/contacts">Contact C</Link>
 				</li>
 			</ul>
-		</div>
-	);
-}
-
-function SignUp() {
-	return (
-		<div>
-			<h2>SignUp</h2>
 		</div>
 	);
 }
