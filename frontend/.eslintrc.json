@@ -23,7 +23,8 @@
 		"react/jsx-filename-extension": "off",
 		"no-unused-vars": "warn",
     "react/prefer-stateless-function": "off",
-		"import-helpers/order-imports": [
+    "class-methods-use-this": ["error", { "enforceForClassFields": false }],
+    "import-helpers/order-imports": [
 			"warn",
 			{
 				"newlinesBetween": "always",

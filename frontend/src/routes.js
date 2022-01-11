@@ -6,7 +6,7 @@ import {
 	Link,
 } from 'react-router-dom';
 
-import SignIn from './pages/public/SignIn';
+import Login from './pages/public/Login';
 
 function Home() {
 	return (
@@ -64,7 +64,7 @@ function Menu() {
 				<Link to="/messages">Messages</Link>
 			</li>
 			<li>
-				<Link to="/signin">SignIn</Link>
+				<Link to="/login">SignIn</Link>
 			</li>
 		</ul>
 	);
@@ -78,7 +78,7 @@ export default function Routes() {
 					<Route exact path="/" element={<Home />} />
 					<Route path="/contacts" element={<Contacts />} />
 					<Route path="/messages" element={<Messages />} />
-					<Route path="/signin" element={<SignIn />} />
+					<Route path="/login" element={<Login />} />
 					<Route path="/signup" element={<SignUp />} />
 				</Switch>
 			</div>
