@@ -30,7 +30,7 @@
 		"react/jsx-props-no-spreading": "warn",
 		"react/no-unused-state": "warn",
 		"react/destructuring-assignment": "warn",
-    "no-nested-ternary": "warn",
+		"no-nested-ternary": "warn",
 		"no-unused-vars": [
 			"warn",
 			{

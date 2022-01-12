@@ -13,7 +13,7 @@ const TEST_EMAIL2 = 'jest2@accounts.com';
 const HASH_TEST_PASSWORD =
 	'$2a$10$Ive59EREl/VkatAZYl9qF.MI5u3Db4vV/bK/pkHXgxHNUrl.CEFMu';
 const TEST_PASSWORD = '123456';
-let testId: number = 0;
+let testId = 0;
 let jwt: string = null;
 
 beforeAll(async () => {

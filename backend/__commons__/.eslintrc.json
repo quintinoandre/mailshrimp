@@ -19,12 +19,12 @@
 	"ignorePatterns": ["*.test.js", "*.test.tsx"],
 	"rules": {
 		"prettier/prettier": "error",
-		"no-console": "off",
+		"no-console": "warn",
 		"import/no-unresolved": "off",
-    "radix": "off",
-    "import/prefer-default-export": "off",
-    "@typescript-eslint/no-explicit-any": "off",
-    "import/extensions": "off",
+		"radix": "off",
+		"import/prefer-default-export": "off",
+		"@typescript-eslint/no-explicit-any": "off",
+		"import/extensions": "off",
 		"import-helpers/order-imports": [
 			"warn",
 			{

@@ -11,8 +11,8 @@ import { IContact } from '../src/models/contacts';
 const TEST_EMAIL = 'jest@accounts.com';
 const TEST_EMAIL2 = 'jest2@accounts.com';
 const TEST_PASSWORD = '123456';
-let testAccountId: number = 0;
-let testContactId: number = 0;
+let testAccountId = 0;
+let testContactId = 0;
 let jwt: string = null;
 
 beforeAll(async () => {

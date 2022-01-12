@@ -120,7 +120,7 @@ async function loginAccount({ body }: Request, res: Response, _next: any) {
 			const isValid = comparePassword(loginPassword, accountPassword);
 
 			if (isValid) {
-				const token = sign(id!);
+				const token = sign(id);
 
 				return res.json({ auth: true, token }); //* OK
 			}

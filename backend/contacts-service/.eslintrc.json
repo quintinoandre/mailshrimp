@@ -19,8 +19,7 @@
 	"ignorePatterns": ["*.test.js", "*.test.tsx"],
 	"rules": {
 		"prettier/prettier": "error",
-		"no-console": "off",
-		"no-unused-vars": "off",
+		"no-console": "warn",
 		"@typescript-eslint/no-unused-vars": [
 			"warn",
 			{
@@ -30,12 +29,12 @@
 		"@typescript-eslint/no-explicit-any": "off",
 		"import/no-unresolved": "off",
 		"radix": "off",
-		"import/no-extraneous-dependencies": "off",
+		"import/no-extraneous-dependencies": "warn",
 		"import/prefer-default-export": "off",
 		"import/extensions": "off",
-		"no-shadow": "off",
-		"@typescript-eslint/no-non-null-assertion": "off",
-		"@typescript-eslint/no-inferrable-types": "off",
+		"no-shadow": "warn",
+		"@typescript-eslint/no-non-null-assertion": "warn",
+		"@typescript-eslint/no-inferrable-types": "warn",
 		"import-helpers/order-imports": [
 			"warn",
 			{

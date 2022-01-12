@@ -24,7 +24,6 @@ async function verify(token: string) {
 		return null;
 	}
 }
+export { Token };
 
 export default { verify };
-
-export { Token };
