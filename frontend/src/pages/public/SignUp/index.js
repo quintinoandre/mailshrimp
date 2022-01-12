@@ -3,7 +3,7 @@ import { Container, Form, Button, Row, Col, Alert } from 'react-bootstrap';
 import { Link, withRouter } from 'react-router-dom';
 
 import Logo from '../../../assets/logo.png';
-import api from '../../../services/api';
+import AccountService from '../../../services/accounts';
 import { BoxContent, BoxForm } from '../../../shared/styles';
 
 class SignUp extends React.Component {
@@ -28,7 +28,9 @@ class SignUp extends React.Component {
 			this.setState({ error: 'Enter all the fields to register' });
 		else {
 			try {
-				await api.post('accounts', { name, email, password, domain });
+				const service = new AccountService();
+
+				await service.signup({ name, email, password, domain });
 
 				this.props.history.push('/login');
 			} catch (error) {

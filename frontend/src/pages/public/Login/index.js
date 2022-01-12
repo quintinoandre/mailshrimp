@@ -3,7 +3,7 @@ import { Button, Form, Container, Row, Col } from 'react-bootstrap';
 import { Link, withRouter } from 'react-router-dom';
 
 import Logo from '../../../assets/logo.png';
-import api from '../../../services/api';
+import AccountService from '../../../services/accounts';
 import { login } from '../../../services/auth';
 import { BoxContent, BoxForm } from '../../../shared/styles';
 
@@ -26,7 +26,9 @@ class Login extends React.Component {
 			this.setState({ error: 'Enter all the fields to access' });
 		else {
 			try {
-				const response = await api.post('accounts/login', { email, password });
+				const service = new AccountService();
+
+				const response = await service.login(email, password);
 
 				login(response.data.token);
 
