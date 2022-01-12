@@ -32,7 +32,9 @@ class Login extends React.Component {
 
 				login(response.data.token);
 
-				this.props.history.push('/');
+				const { history } = this.props;
+
+				history.push('/');
 			} catch (error) {
 				console.error(error);
 
@@ -44,6 +46,8 @@ class Login extends React.Component {
 	};
 
 	render() {
+		const { error } = this.state;
+
 		return (
 			<Container>
 				<Row className="justify-content-md-center">
@@ -55,7 +59,7 @@ class Login extends React.Component {
 							<h2>Login</h2>
 							<p>Enter your data to authenticate:</p>
 							<Form onSubmit={this.handleLogin}>
-								{this.state.error && this.renderError()}
+								{error && this.renderError()}
 								<Form.Group controlId="emailGroup" className="mb-3">
 									<Form.Label>E-mail</Form.Label>
 									<Form.Control
