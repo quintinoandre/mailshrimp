@@ -32,7 +32,9 @@ class SignUp extends React.Component {
 
 				await service.signup({ name, email, password, domain });
 
-				this.props.history.push('/login');
+				const { history } = this.props;
+
+				history.push('/login');
 			} catch (error) {
 				console.error(error);
 
@@ -50,6 +52,8 @@ class SignUp extends React.Component {
 	};
 
 	render() {
+		const { error } = this.state;
+
 		return (
 			<Container>
 				<Row className="justify-content-md-center">
@@ -61,7 +65,7 @@ class SignUp extends React.Component {
 							<h2>Sign Up</h2>
 							<p>Enter all fields to register.</p>
 							<Form onSubmit={this.handleSignUp}>
-								{this.state.error && this.renderError()}
+								{error && this.renderError()}
 								<Form.Group controlId="nameGroup" className="mb-3">
 									<Form.Label>Name</Form.Label>
 									<Form.Control

@@ -28,6 +28,8 @@
 		"no-console": "warn",
 		"react/prop-types": "warn",
     "react/jsx-props-no-spreading":"warn",
+    "react/no-unused-state": "warn",
+    "react/destructuring-assignment": "warn",
 		"no-unused-vars": [
 			"warn",
 			{

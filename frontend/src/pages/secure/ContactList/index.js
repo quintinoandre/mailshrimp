@@ -78,10 +78,7 @@ class Contacts extends React.Component {
 								<h3>Contacts</h3>
 							</Col>
 							<Col>
-								<Link
-									className="btn btn-success float-right"
-									to="/contacts/add"
-								>
+								<Link className="btn btn-success float-end" to="/contacts/add">
 									Add Contact
 								</Link>
 							</Col>
