@@ -6,15 +6,15 @@ import ContactsService from '../../../services/contacts';
 import Header from '../../../shared/header';
 import { PageContent } from '../../../shared/styles';
 
-function RenderLine({ contact }) {
-	const { url } = useRouteMatch;
+function RenderLine({ contact: { id, email, name } }) {
+	const { url } = useRouteMatch();
 
 	return (
-		<tr key={contact.id}>
+		<tr key={id}>
 			<td>
-				<Link to={`${url}/${contact.id}`}>{contact.email}</Link>
+				<Link to={`${url}/${id}`}>{email}</Link>
 			</td>
-			<td>{contact.name}</td>
+			<td>{name}</td>
 		</tr>
 	);
 }
@@ -39,19 +39,16 @@ function RenderTable({ contacts }) {
 
 function RenderEmptyRow() {
 	return (
-		<tr>
-			<td colSpan="2">No contact available.</td>
-		</tr>
+		<Col>
+			<p colSpan="2">No contact available.</p>
+		</Col>
 	);
 }
 
 class Contacts extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = {
-			isLoading: true,
-			contacts: [],
-		};
+		this.state = { isLoading: true, contacts: [] };
 	}
 
 	async componentDidMount() {
@@ -59,10 +56,7 @@ class Contacts extends React.Component {
 
 		const result = await service.getAll();
 
-		this.setState({
-			isLoading: false,
-			contacts: result,
-		});
+		this.setState({ isLoading: false, contacts: result });
 	}
 
 	render() {
@@ -84,8 +78,13 @@ class Contacts extends React.Component {
 							</Col>
 						</Row>
 						<p>List of registered contacts.</p>
-						{contacts.length === 0 && <RenderEmptyRow />}
-						{isLoading !== true && <RenderTable contacts={contacts} />}
+						{!contacts.length ? (
+							<RenderEmptyRow />
+						) : isLoading ? (
+							<p>Loading...</p>
+						) : (
+							<RenderTable contacts={contacts} />
+						)}
 					</Container>
 				</PageContent>
 			</>

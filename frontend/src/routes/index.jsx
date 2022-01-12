@@ -10,6 +10,7 @@ import LoginPage from '../pages/public/Login';
 import SignUpPage from '../pages/public/SignUp';
 import ContactsAddPage from '../pages/secure/ContactAdd';
 import ContactsListPage from '../pages/secure/ContactList';
+import ContactsDetailPage from '../pages/secure/ContactDetail';
 import DashboardPage from '../pages/secure/Dashboard';
 import RoutePrivate from './route-wrapper';
 
@@ -20,6 +21,11 @@ function Routes() {
 				<RoutePrivate exact path="/" component={DashboardPage} />
 				<RoutePrivate exact path="/contacts" component={ContactsListPage} />
 				<RoutePrivate exact path="/contacts/add" component={ContactsAddPage} />
+				<RoutePrivate
+					exact
+					path="/contacts/:contactId"
+					component={ContactsDetailPage}
+				/>
 				<Route exact path="/login" component={LoginPage} />
 				<Route exact path="/signup" component={SignUpPage} />
 			</Switch>

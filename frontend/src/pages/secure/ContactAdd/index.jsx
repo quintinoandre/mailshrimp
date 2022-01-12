@@ -44,11 +44,11 @@ class ContactAdd extends React.Component {
 		}
 	};
 
-	renderError = () => {
+	renderError() {
 		const { error } = this.state;
 
 		return <Alert variant="danger">{error}</Alert>;
-	};
+	}
 
 	render() {
 		const { error } = this.state;
