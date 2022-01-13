@@ -2,8 +2,16 @@ import fs from 'fs';
 import jwt, { VerifyOptions } from 'jsonwebtoken';
 import path from 'path';
 
+function findKeysPath(currentPath: string): string {
+	const keysPath = path.join(currentPath, 'keys');
+
+	if (fs.existsSync(keysPath)) return keysPath;
+
+	return findKeysPath(path.join(currentPath, '..'));
+}
+
 const publicKey = fs.readFileSync(
-	path.resolve(__dirname, '../../keys/public.key'),
+	path.join(findKeysPath(__dirname), 'public.key'),
 	'utf8'
 );
 
@@ -26,4 +34,4 @@ async function verify(token: string) {
 }
 export { Token };
 
-export default { verify };
+export default { verify, findKeysPath };
