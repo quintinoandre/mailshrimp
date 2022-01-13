@@ -17,20 +17,20 @@ function validateSchema(
 
 	const message = details.map((item) => item.message).join(',');
 
-	console.log(message);
+	console.log(`validateSchema: ${message}`);
 
-	return res.status(422).end(); //! Unprocessable Entity
+	return res.status(422).json({ entity: body, message }); //! Unprocessable Entity
 }
 
 async function validateAuth({ headers }: Request, res: Response, next: any) {
 	try {
 		const token = headers['x-access-token'] as string;
 
-		if (!token) return res.status(401).end(); //! Unauthorized
+		if (!token) return res.sendStatus(401); //! Unauthorized
 
 		const payload = await auth.verify(token);
 
-		if (!payload) return res.status(401).end(); //! Unauthorized
+		if (!payload) return res.sendStatus(401); //! Unauthorized
 
 		res.locals.payload = payload;
 
@@ -38,7 +38,7 @@ async function validateAuth({ headers }: Request, res: Response, next: any) {
 	} catch (error) {
 		console.error(`validateAuth: ${error}`);
 
-		return res.status(401).end(); //! Unauthorized
+		return res.sendStatus(400); //! Bad Request
 	}
 }
 

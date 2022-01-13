@@ -32,15 +32,15 @@ async function getAccount({ params }: Request, res: Response, _next: any) {
 	try {
 		const id = parseInt(params.id);
 
-		if (!id) return res.status(400).end(); //! Bad Request
+		if (!id) return res.status(400).json({ message: 'id is required!' }); //! Bad Request
 
 		const token = getToken(res) as Token;
 
-		if (id !== token.accountId) return res.status(403).end(); //! Forbidden
+		if (id !== token.accountId) return res.sendStatus(403); //! Forbidden
 
 		const account = await findById(id);
 
-		if (!account) return res.status(404).end(); //! Not Found
+		if (!account) return res.sendStatus(404); //! Not Found
 
 		account.password = '';
 
@@ -48,7 +48,7 @@ async function getAccount({ params }: Request, res: Response, _next: any) {
 	} catch (error) {
 		console.error(`getAccount: ${error}`);
 
-		return res.status(400).end(); //! Bad Request
+		return res.sendStatus(400); //! Bad Request
 	}
 }
 
@@ -66,7 +66,7 @@ async function addAccount({ body }: Request, res: Response, _next: any) {
 	} catch (error) {
 		console.error(`addAccount: ${error}`);
 
-		res.status(400).end(); //! Bad Request
+		res.sendStatus(400); //! Bad Request
 	}
 }
 
@@ -78,11 +78,11 @@ async function setAccount(
 	try {
 		const id = parseInt(params.id);
 
-		if (!id) return res.status(400).end(); //! Bad Request
+		if (!id) return res.status(400).json({ message: 'id is required!' }); //! Bad Request
 
 		const token = getToken(res) as Token;
 
-		if (id !== token.accountId) return res.status(403).end(); //! Forbidden
+		if (id !== token.accountId) return res.sendStatus(403); //! Forbidden
 
 		const accountParams = body as IAccount;
 
@@ -98,11 +98,11 @@ async function setAccount(
 			return res.status(200).json(updatedAccount); //* OK
 		}
 
-		return res.status(404).end(); //! Not Found
+		return res.sendStatus(404); //! Not Found
 	} catch (error) {
 		console.error(`setAccount: ${error}`);
 
-		return res.status(400).end(); //! Bad Request
+		return res.sendStatus(400); //! Bad Request
 	}
 }
 
@@ -124,13 +124,15 @@ async function loginAccount({ body }: Request, res: Response, _next: any) {
 
 				return res.json({ auth: true, token }); //* OK
 			}
+
+			return res.sendStatus(401); //! Unauthorized
 		}
 
-		return res.status(401).end(); //! Unauthorized
+		return res.sendStatus(404); //! Not Found
 	} catch (error) {
 		console.error(`loginAccount: ${error}`);
 
-		return res.status(400).end(); //! Bad Request
+		return res.sendStatus(400); //! Bad Request
 	}
 }
 
@@ -142,19 +144,19 @@ async function deleteAccount({ params }: Request, res: Response, _next: any) {
 	try {
 		const id = parseInt(params.id);
 
-		if (!id) return res.status(400).end(); //! Bad Request
+		if (!id) return res.status(400).json({ message: 'id is required!' }); //! Bad Request
 
 		const token = getToken(res) as Token;
 
-		if (id !== token.accountId) return res.status(403).end(); //! Forbidden
+		if (id !== token.accountId) return res.sendStatus(403); //! Forbidden
 
 		await remove(id);
 
-		return res.status(200).end(); // * OK
+		return res.sendStatus(204); // * No content
 	} catch (error) {
 		console.error(`deleteAccount: ${error}`);
 
-		return res.status(400).end(); //! Bad Request
+		return res.sendStatus(400); //! Bad Request
 	}
 }
 

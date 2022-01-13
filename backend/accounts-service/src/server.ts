@@ -4,7 +4,7 @@ import app from './app';
 
 (async () => {
 	try {
-		const { PORT, DB_NAME } = process.env;
+		const { PORT, DB_NAME, MS_NAME } = process.env;
 
 		await database.sync();
 
@@ -12,7 +12,7 @@ import app from './app';
 
 		await app.listen(PORT);
 
-		console.log(`Running on port ${PORT}!`);
+		console.log(`${MS_NAME} running on port ${PORT}!`);
 	} catch (error) {
 		console.error(`${error}`);
 	}
