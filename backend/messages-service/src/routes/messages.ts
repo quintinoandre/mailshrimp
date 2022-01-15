@@ -5,6 +5,7 @@ import {
 	getMessage,
 	addMessage,
 	setMessage,
+	deleteMessage,
 } from '@controllers/messages';
 import { validateAuth } from '@ms-commons/api/routes/middlewares';
 
@@ -27,5 +28,7 @@ router.patch(
 	validateUpdateMessageSchema,
 	setMessage
 );
+
+router.delete('/messages/:id', validateAuth, deleteMessage);
 
 export default router;

@@ -7,6 +7,7 @@ import accountsApp from '../../accounts-service/src/app';
 import app from '../src/app';
 import { IContact } from '../src/models/contact';
 import { add, removeByEmail } from '../src/models/contactRepository';
+import { ContactStatus } from '../src/models/contactStatus';
 
 const TEST_EMAIL = 'jest@accounts.com';
 const TEST_EMAIL2 = 'jest2@accounts.com';
@@ -62,7 +63,7 @@ afterAll(async () => {
 	console.log(`removeResult: ${removeResult}:${removeResult2}`);
 
 	const deleteResponse = await request(accountsApp)
-		.delete(`/accounts/${testAccountId}`)
+		.delete(`/accounts/${testAccountId}?force=true`)
 		.set('x-access-token', jwt);
 
 	console.log(`deleteResponse ${deleteResponse.status}`);
@@ -237,5 +238,30 @@ describe('Testing routes of contacts', () => {
 			.send(payload);
 
 		expect(status).toEqual(400);
+	});
+
+	it(`DELETE /contacts/:id - should return statusCode 200 (${STATUS_CODES[200]})`, async () => {
+		const { status, body } = await request(app)
+			.delete(`/contacts/${testContactId}`)
+			.set('x-access-token', jwt);
+
+		expect(status).toEqual(200);
+		expect(body.status).toEqual(ContactStatus.REMOVED);
+	});
+
+	it(`DELETE /contacts/:id?force=true - should return statusCode 204 (${STATUS_CODES[204]})`, async () => {
+		const { status } = await request(app)
+			.delete(`/contacts/${testContactId}?force=true`)
+			.set('x-access-token', jwt);
+
+		expect(status).toEqual(204);
+	});
+
+	it(`DELETE /contacts/:id - should return statusCode 403 (${STATUS_CODES[403]})`, async () => {
+		const { status } = await request(app)
+			.delete(`/contacts/-1`)
+			.set('x-access-token', jwt);
+
+		expect(status).toEqual(403);
 	});
 });

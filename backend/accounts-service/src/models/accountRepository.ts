@@ -2,9 +2,16 @@ import { DestroyOptions } from 'sequelize/dist';
 
 import { IAccount } from './account';
 import accountModel, { IAccountModel } from './accountModel';
+import { AccountStatus } from './accountStatus';
 
-function findAll() {
-	return accountModel.findAll<IAccountModel>();
+function findAll(includeRemoved: boolean) {
+	const { ACTIVE, CREATED, SUSPENDED } = AccountStatus;
+
+	if (includeRemoved) return accountModel.findAll<IAccountModel>();
+
+	return accountModel.findAll<IAccountModel>({
+		where: { status: [ACTIVE, CREATED, SUSPENDED] },
+	});
 }
 
 function findByEmail(email: string) {
@@ -47,7 +54,7 @@ async function set(id: number, account: IAccount) {
 	return null;
 }
 
-function remove(id: number) {
+function removeById(id: number) {
 	return accountModel.destroy({ where: { id } } as DestroyOptions<IAccount>);
 }
 
@@ -55,4 +62,4 @@ function removeByEmail(email: string) {
 	return accountModel.destroy({ where: { email } } as DestroyOptions<IAccount>);
 }
 
-export { findAll, findByEmail, findById, add, set, remove, removeByEmail };
+export { findAll, findByEmail, findById, add, set, removeById, removeByEmail };

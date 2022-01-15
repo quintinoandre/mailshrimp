@@ -1,15 +1,24 @@
 import { Request, Response } from 'express';
 
 import { IContact } from '@models/contact';
-import { add, findAll, findById, set } from '@models/contactRepository';
+import {
+	add,
+	findAll,
+	findById,
+	removeById,
+	set,
+} from '@models/contactRepository';
+import { ContactStatus } from '@models/contactStatus';
 import { Token } from '@ms-commons/api/auth';
 import { getToken } from '@ms-commons/api/controllers/controller';
 
-async function getContacts(_req: Request, res: Response, _next: any) {
+async function getContacts({ query }: Request, res: Response, _next: any) {
 	try {
+		const includeRemoved = query.includeRemoved === 'true';
+
 		const { accountId } = getToken(res) as Token;
 
-		const contacts = await findAll(accountId);
+		const contacts = await findAll(accountId, includeRemoved);
 
 		res.status(200).json(contacts); //* OK
 	} catch (error) {
@@ -81,4 +90,36 @@ async function setContact(
 	}
 }
 
-export { getContacts, getContact, addContact, setContact };
+async function deleteContact(
+	{ params, query: { force } }: Request,
+	res: Response,
+	_next: any
+) {
+	try {
+		const id = parseInt(params.id);
+
+		if (!id) return res.status(400).json({ message: 'id is required!' }); //! Bad Request
+
+		const { accountId } = getToken(res) as Token;
+
+		if (force === 'true') {
+			await removeById(id, accountId);
+
+			return res.sendStatus(204); // * No content
+		}
+
+		const contactParams = { status: ContactStatus.REMOVED } as IContact;
+
+		const updatedContact = await set(id, contactParams, accountId);
+
+		if (updatedContact) return res.status(200).json(updatedContact); //* OK
+
+		return res.sendStatus(403); //! Forbidden
+	} catch (error) {
+		console.error(`deleteContact: ${error}`);
+
+		return res.sendStatus(400); //! Bad Request
+	}
+}
+
+export { getContacts, getContact, addContact, setContact, deleteContact };

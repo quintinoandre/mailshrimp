@@ -7,6 +7,7 @@ import accountsApp from '../../accounts-service/src/app';
 import app from '../src/app';
 import { IMessage } from '../src/models/message';
 import { add, removeById } from '../src/models/messageRepository';
+import { MessageStatus } from '../src/models/messageStatus';
 
 const TEST_EMAIL = 'jest@accounts.com';
 const TEST_PASSWORD = '123456';
@@ -62,7 +63,7 @@ afterAll(async () => {
 	console.log(`removeResult: ${removeResult}:${removeResult2}`);
 
 	const deleteResponse = await request(accountsApp)
-		.delete(`/accounts/${testAccountId}`)
+		.delete(`/accounts/${testAccountId}?force=true`)
 		.set('x-access-token', jwt);
 
 	console.log(`deleteResponse ${deleteResponse.status}`);
@@ -224,5 +225,30 @@ describe('Testing routes of messages', () => {
 			.send(payload);
 
 		expect(status).toEqual(400);
+	});
+
+	it(`DELETE /messages/:id - should return statusCode 200 (${STATUS_CODES[200]})`, async () => {
+		const { status, body } = await request(app)
+			.delete(`/messages/${testMessageId}`)
+			.set('x-access-token', jwt);
+
+		expect(status).toEqual(200);
+		expect(body.status).toEqual(MessageStatus.REMOVED);
+	});
+
+	it(`DELETE /messages/:id?force=true - should return statusCode 204 (${STATUS_CODES[204]})`, async () => {
+		const { status } = await request(app)
+			.delete(`/messages/${testMessageId}?force=true`)
+			.set('x-access-token', jwt);
+
+		expect(status).toEqual(204);
+	});
+
+	it(`DELETE /messages/:id - should return statusCode 403 (${STATUS_CODES[403]})`, async () => {
+		const { status } = await request(app)
+			.delete(`/messages/-1`)
+			.set('x-access-token', jwt);
+
+		expect(status).toEqual(403);
 	});
 });

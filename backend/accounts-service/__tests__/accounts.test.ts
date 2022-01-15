@@ -7,6 +7,7 @@ import app from '../src/app';
 import { sign } from '../src/auth';
 import { IAccount } from '../src/models/account';
 import { add, removeByEmail } from '../src/models/accountRepository';
+import { AccountStatus } from '../src/models/accountStatus';
 
 const TEST_EMAIL = 'jest@accounts.com';
 const TEST_EMAIL2 = 'jest2@accounts.com';
@@ -142,9 +143,18 @@ describe('Testing routes of accounts', () => {
 		expect(status).toEqual(400);
 	});
 
-	it(`DELETE /accounts/:id - should return statusCode 204 (${STATUS_CODES[204]})`, async () => {
-		const { status } = await request(app)
+	it(`DELETE /accounts/:id - should return statusCode 200 (${STATUS_CODES[200]})`, async () => {
+		const { status, body } = await request(app)
 			.delete(`/accounts/${testId}`)
+			.set('x-access-token', jwt);
+
+		expect(status).toEqual(200);
+		expect(body.status).toEqual(AccountStatus.REMOVED);
+	});
+
+	it(`DELETE /accounts/:id?force=true - should return statusCode 204 (${STATUS_CODES[204]})`, async () => {
+		const { status } = await request(app)
+			.delete(`/accounts/${testId}?force=true`)
 			.set('x-access-token', jwt);
 
 		expect(status).toEqual(204);

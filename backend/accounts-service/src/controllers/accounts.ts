@@ -7,15 +7,18 @@ import {
 	findById,
 	add,
 	set,
-	remove,
+	removeById,
 } from '@models/accountRepository';
+import { AccountStatus } from '@models/accountStatus';
 import { Token } from '@ms-commons/api/auth';
 import { getToken } from '@ms-commons/api/controllers/controller';
 
 import { comparePassword, hashPassword, sign } from '../auth';
 
-async function getAccounts(_req: Request, res: Response, _next: any) {
-	const accounts = await findAll();
+async function getAccounts({ query }: Request, res: Response, _next: any) {
+	const includeRemoved = query.includeRemoved === 'true';
+
+	const accounts = await findAll(includeRemoved);
 
 	res.json(
 		accounts.map((_account) => {
@@ -138,7 +141,11 @@ function logoutAccount(req: Request, res: Response, _next: any) {
 	res.json({ auth: false, token: null }); //* OK
 }
 
-async function deleteAccount({ params }: Request, res: Response, _next: any) {
+async function deleteAccount(
+	{ params, query: { force } }: Request,
+	res: Response,
+	_next: any
+) {
 	try {
 		const id = parseInt(params.id);
 
@@ -148,9 +155,17 @@ async function deleteAccount({ params }: Request, res: Response, _next: any) {
 
 		if (id !== accountId) return res.sendStatus(403); //! Forbidden
 
-		await remove(id);
+		if (force === 'true') {
+			await removeById(id);
 
-		return res.sendStatus(204); // * No content
+			return res.sendStatus(204); // * No content
+		}
+
+		const accountParams = { status: AccountStatus.REMOVED } as IAccount;
+
+		const updatedAccount = await set(id, accountParams);
+
+		return res.status(200).json(updatedAccount); //* OK
 	} catch (error) {
 		console.error(`deleteAccount: ${error}`);
 

@@ -5,6 +5,7 @@ import {
 	getContact,
 	addContact,
 	setContact,
+	deleteContact,
 } from '@controllers/contacts';
 import { validateAuth } from '@ms-commons/api/routes/middlewares';
 
@@ -27,5 +28,7 @@ router.patch(
 	validateUpdateContactSchema,
 	setContact
 );
+
+router.delete('/contacts/:id', validateAuth, deleteContact);
 
 export default router;
