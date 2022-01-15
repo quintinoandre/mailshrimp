@@ -13,10 +13,18 @@ function findAll(accountId: number, includeRemoved: boolean) {
 	});
 }
 
-function findById(messageId: number, accountId: number) {
-	return messageModel.findOne<IMessageModel>({
-		where: { id: messageId, accountId },
-	});
+async function findById(messageId: number, accountId: number) {
+	try {
+		const message = await messageModel.findOne<IMessageModel>({
+			where: { id: messageId, accountId },
+		});
+
+		return message;
+	} catch (error) {
+		console.log(`messageRepository.findById: ${error}`);
+
+		return null;
+	}
 }
 
 async function add(message: IMessage, accountId: number) {

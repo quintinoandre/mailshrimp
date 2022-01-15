@@ -6,6 +6,7 @@ import {
 	addMessage,
 	setMessage,
 	deleteMessage,
+	sendMessage,
 } from '@controllers/messages';
 import { validateAuth } from '@ms-commons/api/routes/middlewares';
 
@@ -30,5 +31,7 @@ router.patch(
 );
 
 router.delete('/messages/:id', validateAuth, deleteMessage);
+
+router.post('messages/:id/send', validateAuth, sendMessage);
 
 export default router;

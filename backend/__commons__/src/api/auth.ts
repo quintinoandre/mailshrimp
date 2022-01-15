@@ -17,7 +17,7 @@ const publicKey = fs.readFileSync(
 
 const JWT_ALGORITHM = 'RS256';
 
-type Token = { accountId: number };
+type Token = { accountId: number; jwt?: string };
 
 async function verify(token: string) {
 	try {
@@ -25,7 +25,7 @@ async function verify(token: string) {
 			algorithm: [JWT_ALGORITHM],
 		} as VerifyOptions)) as Token;
 
-		return { accountId: tokenDecoded.accountId };
+		return { accountId: tokenDecoded.accountId, jwt: token };
 	} catch (error) {
 		console.error(`verify: ${error}`);
 

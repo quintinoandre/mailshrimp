@@ -11,6 +11,7 @@ import {
 import { MessageStatus } from '@models/messageStatus';
 import { Token } from '@ms-commons/api/auth';
 import { getToken } from '@ms-commons/api/controllers/controller';
+import { getContacts } from '@ms-commons/clients/contactsService';
 
 async function getMessages({ query }: Request, res: Response, _next: any) {
 	try {
@@ -122,4 +123,49 @@ async function deleteMessage(
 	}
 }
 
-export { getMessages, getMessage, addMessage, setMessage, deleteMessage };
+async function sendMessage({ params }: Request, res: Response, _next: any) {
+	try {
+		// obtendo a mensagem
+		const id = parseInt(params.id);
+
+		if (!id) return res.status(400).json({ message: 'id is required!' }); //! Bad Request
+
+		const { accountId, jwt } = getToken(res) as Token;
+
+		const message = findById(id, accountId);
+
+		if (!message) return res.sendStatus(403); //! Forbidden
+
+		// obtendos os contactos
+		const contacts = await getContacts(jwt);
+
+		if (!contacts || contacts.length < 1) return res.sendStatus(400); //! Bad Request
+
+		// TODO: enviar a mensagem para os contactos
+
+		// atualizando a mensagem
+		const messageParams = {
+			status: MessageStatus.SENT,
+			sendDate: new Date(),
+		} as IMessage;
+
+		const updatedMessage = set(id, messageParams, accountId);
+
+		if (updatedMessage) return res.status(200).json(updatedMessage); //* OK
+
+		return res.sendStatus(403); //! Forbidden
+	} catch (error) {
+		console.error(`sendMessage: ${error}`);
+
+		return res.sendStatus(400); //! Bad Request
+	}
+}
+
+export {
+	getMessages,
+	getMessage,
+	addMessage,
+	setMessage,
+	deleteMessage,
+	sendMessage,
+};
