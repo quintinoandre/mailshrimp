@@ -193,7 +193,7 @@ describe('Testing routes of contacts', () => {
 			.send(payload);
 
 		expect(status).toEqual(200);
-		expect(name).toEqual('Luiz');
+		expect(name).toEqual(payload.name);
 	});
 
 	it(`PATCH /contacts/:id - should return statusCode 401 (${STATUS_CODES[401]})`, async () => {
