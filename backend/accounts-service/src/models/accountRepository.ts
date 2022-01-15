@@ -1,7 +1,7 @@
 import { DestroyOptions } from 'sequelize/dist';
 
+import { IAccount } from './account';
 import accountModel, { IAccountModel } from './accountModel';
-import { IAccount } from './accounts';
 
 function findAll() {
 	return accountModel.findAll<IAccountModel>();

@@ -5,8 +5,8 @@ import { describe, expect, it, beforeAll, afterAll } from '@jest/globals';
 
 import app from '../src/app';
 import { sign } from '../src/auth';
+import { IAccount } from '../src/models/account';
 import { add, removeByEmail } from '../src/models/accountRepository';
-import { IAccount } from '../src/models/accounts';
 
 const TEST_EMAIL = 'jest@accounts.auth.com';
 const HASH_TEST_PASSWORD =
@@ -36,42 +36,39 @@ afterAll(async () => {
 
 describe('Testing routes of authentication', () => {
 	it(`POST /accounts/login - should return statusCode 200 (${STATUS_CODES[200]})`, async () => {
-		const payload = {
-			email: TEST_EMAIL,
-			password: TEST_PASSWORD,
-		};
+		const payload = { email: TEST_EMAIL, password: TEST_PASSWORD };
 
-		const result = await request(app).post('/accounts/login').send(payload);
+		const {
+			status,
+			body: { auth, token },
+		} = await request(app).post('/accounts/login').send(payload);
 
-		expect(result.status).toEqual(200);
-		expect(result.body.auth).toBeTruthy();
-		expect(result.body.token).toBeTruthy();
+		expect(status).toEqual(200);
+		expect(auth).toBeTruthy();
+		expect(token).toBeTruthy();
 	});
 
 	it(`POST /accounts/login - should return statusCode 422 (${STATUS_CODES[422]})`, async () => {
 		const payload = { email: TEST_EMAIL };
 
-		const result = await request(app).post('/accounts/login').send(payload);
+		const { status } = await request(app).post('/accounts/login').send(payload);
 
-		expect(result.status).toEqual(422);
+		expect(status).toEqual(422);
 	});
 
 	it(`POST /accounts/login - should return statusCode 401 (${STATUS_CODES[401]})`, async () => {
-		const payload = {
-			email: TEST_EMAIL,
-			password: `${TEST_PASSWORD}1`,
-		};
+		const payload = { email: TEST_EMAIL, password: `${TEST_PASSWORD}1` };
 
-		const result = await request(app).post('/accounts/login').send(payload);
+		const { status } = await request(app).post('/accounts/login').send(payload);
 
-		expect(result.status).toEqual(401);
+		expect(status).toEqual(401);
 	});
 
 	it(`POST /accounts/logout - should return statusCode 200 (${STATUS_CODES[200]})`, async () => {
-		const result = await request(app)
+		const { status } = await request(app)
 			.post('/accounts/logout')
 			.set('x-access-token', jwt);
 
-		expect(result.status).toEqual(200);
+		expect(status).toEqual(200);
 	});
 });

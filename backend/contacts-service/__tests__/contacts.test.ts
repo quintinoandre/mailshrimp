@@ -5,8 +5,8 @@ import { describe, expect, it, beforeAll, afterAll } from '@jest/globals';
 
 import accountsApp from '../../accounts-service/src/app';
 import app from '../src/app';
+import { IContact } from '../src/models/contact';
 import { add, removeByEmail } from '../src/models/contactRepository';
-import { IContact } from '../src/models/contacts';
 
 const TEST_EMAIL = 'jest@accounts.com';
 const TEST_EMAIL2 = 'jest2@accounts.com';
@@ -23,18 +23,24 @@ beforeAll(async () => {
 		domain: 'jest.com',
 	};
 
-	const account = await request(accountsApp)
+	const accountResponse = await request(accountsApp)
 		.post('/accounts/')
 		.send(testAccount);
 
-	testAccountId = account.body.id;
+	console.log(`accountResponse: ${accountResponse.status}`);
 
-	const result = await request(accountsApp).post('/accounts/login').send({
-		email: TEST_EMAIL,
-		password: TEST_PASSWORD,
-	});
+	testAccountId = accountResponse.body.id;
 
-	jwt = result.body.token;
+	const loginResponse = await request(accountsApp)
+		.post('/accounts/login')
+		.send({
+			email: TEST_EMAIL,
+			password: TEST_PASSWORD,
+		});
+
+	console.log(`loginResponse: ${loginResponse.status}`);
+
+	jwt = loginResponse.body.token;
 
 	const testContact = {
 		name: 'jest',
@@ -42,70 +48,80 @@ beforeAll(async () => {
 		phone: '00351123456789',
 	} as IContact;
 
-	const result2 = await add(testContact, testAccountId);
+	const addResult = await add(testContact, testAccountId);
 
-	testContactId = result2.id;
+	console.log(`addResult: ${addResult}`);
+
+	testContactId = addResult.id;
 });
 
 afterAll(async () => {
-	await removeByEmail(TEST_EMAIL, testAccountId);
+	const removeResult = await removeByEmail(TEST_EMAIL, testAccountId);
+	const removeResult2 = await removeByEmail(TEST_EMAIL2, testAccountId);
 
-	await removeByEmail(TEST_EMAIL2, testAccountId);
+	console.log(`removeResult: ${removeResult}:${removeResult2}`);
 
-	await request(accountsApp)
+	const deleteResponse = await request(accountsApp)
 		.delete(`/accounts/${testAccountId}`)
 		.set('x-access-token', jwt);
 
-	await request(accountsApp)
+	console.log(`deleteResponse ${deleteResponse.status}`);
+
+	const logoutResponse = await request(accountsApp)
 		.post(`/accounts/logout`)
 		.set('x-access-token', jwt);
+
+	console.log(`logoutResponse ${logoutResponse.status}`);
 });
 
 describe('Testing routes of contacts', () => {
 	it(`GET /contacts/ - should return statusCode 200 (${STATUS_CODES[200]})`, async () => {
-		const result = await request(app)
+		const { status, body } = await request(app)
 			.get('/contacts/')
 			.set('x-access-token', jwt);
 
-		expect(result.status).toEqual(200);
-		expect(Array.isArray(result.body)).toBeTruthy();
+		expect(status).toEqual(200);
+		expect(Array.isArray(body)).toBeTruthy();
 	});
 
 	it(`GET /contacts/ - should return statusCode 401 (${STATUS_CODES[401]})`, async () => {
-		const result = await request(app).get('/contacts/');
+		const { status } = await request(app).get('/contacts/');
 
-		expect(result.status).toEqual(401);
+		expect(status).toEqual(401);
 	});
 
 	it(`GET /contacts/:id - should return statusCode 200 (${STATUS_CODES[200]})`, async () => {
-		const result = await request(app)
+		const {
+			status,
+			body: { id },
+		} = await request(app)
 			.get(`/contacts/${testContactId}`)
 			.set('x-access-token', jwt);
 
-		expect(result.status).toEqual(200);
-		expect(result.body.id).toEqual(testContactId);
+		expect(status).toEqual(200);
+		expect(id).toEqual(testContactId);
 	});
 
 	it(`GET /contacts/:id - should return statusCode 404 (${STATUS_CODES[404]})`, async () => {
-		const result = await request(app)
+		const { status } = await request(app)
 			.get('/contacts/-1')
 			.set('x-access-token', jwt);
 
-		expect(result.status).toEqual(404);
+		expect(status).toEqual(404);
 	});
 
 	it(`GET /contacts/:id - should return statusCode 400 (${STATUS_CODES[400]})`, async () => {
-		const result = await request(app)
+		const { status } = await request(app)
 			.get('/contacts/abc')
 			.set('x-access-token', jwt);
 
-		expect(result.status).toEqual(400);
+		expect(status).toEqual(400);
 	});
 
 	it(`GET /contacts/:id - should return statusCode 401 (${STATUS_CODES[401]})`, async () => {
-		const result = await request(app).get(`/contacts/${testContactId}`);
+		const { status } = await request(app).get(`/contacts/${testContactId}`);
 
-		expect(result.status).toEqual(401);
+		expect(status).toEqual(401);
 	});
 
 	it(`POST /contacts/ - should return statusCode 201 (${STATUS_CODES[201]})`, async () => {
@@ -115,24 +131,27 @@ describe('Testing routes of contacts', () => {
 			phone: '00351123456789',
 		} as IContact;
 
-		const result = await request(app)
+		const {
+			status,
+			body: { id },
+		} = await request(app)
 			.post('/contacts/')
 			.set('x-access-token', jwt)
 			.send(testContact);
 
-		expect(result.status).toEqual(201);
-		expect(result.body.id).toBeTruthy();
+		expect(status).toEqual(201);
+		expect(id).toBeTruthy();
 	});
 
 	it(`POST /contacts/ - should return statusCode 422 (${STATUS_CODES[422]})`, async () => {
 		const payload = { street: 'jest2' };
 
-		const result = await request(app)
+		const { status } = await request(app)
 			.post('/contacts/')
 			.set('x-access-token', jwt)
 			.send(payload);
 
-		expect(result.status).toEqual(422);
+		expect(status).toEqual(422);
 	});
 
 	it(`POST /contacts/ - should return statusCode 401 (${STATUS_CODES[401]})`, async () => {
@@ -142,9 +161,9 @@ describe('Testing routes of contacts', () => {
 			phone: '00351123456789',
 		} as IContact;
 
-		const result = await request(app).post('/contacts/').send(payload);
+		const { status } = await request(app).post('/contacts/').send(payload);
 
-		expect(result.status).toEqual(401);
+		expect(status).toEqual(401);
 	});
 
 	it(`POST /contacts/ - should return statusCode 400 (${STATUS_CODES[400]})`, async () => {
@@ -154,66 +173,69 @@ describe('Testing routes of contacts', () => {
 			phone: '00351123456789',
 		} as IContact;
 
-		const result = await request(app)
+		const { status } = await request(app)
 			.post('/contacts/')
 			.set('x-access-token', jwt)
 			.send(payload);
 
-		expect(result.status).toEqual(400);
+		expect(status).toEqual(400);
 	});
 
 	it(`PATCH /contacts/:id - should return statusCode 200 (${STATUS_CODES[200]})`, async () => {
 		const payload = { name: 'Luiz' };
 
-		const result = await request(app)
+		const {
+			status,
+			body: { name },
+		} = await request(app)
 			.patch(`/contacts/${testContactId}`)
 			.set('x-access-token', jwt)
 			.send(payload);
 
-		expect(result.status).toEqual(200);
-		expect(result.body.name).toEqual('Luiz');
+		expect(status).toEqual(200);
+		expect(name).toEqual('Luiz');
 	});
 
 	it(`PATCH /contacts/:id - should return statusCode 401 (${STATUS_CODES[401]})`, async () => {
 		const payload = { name: 'Luiz' };
 
-		const result = await request(app)
+		const { status } = await request(app)
 			.patch(`/contacts/${testContactId}`)
 			.send(payload);
 
-		expect(result.status).toEqual(401);
+		expect(status).toEqual(401);
 	});
 
 	it(`PATCH /contacts/:id - should return statusCode 422 (${STATUS_CODES[422]})`, async () => {
 		const payload = { street: 'Luiz' };
 
-		const result = await request(app)
+		const { status } = await request(app)
 			.patch(`/contacts/${testContactId}`)
 			.set('x-access-token', jwt)
 			.send(payload);
 
-		expect(result.status).toEqual(422);
+		expect(status).toEqual(422);
 	});
 
 	it(`PATCH /contacts/:id - should return statusCode 404 (${STATUS_CODES[404]})`, async () => {
 		const payload = { name: 'Luiz' };
 
-		const result = await request(app)
+		const { status } = await request(app)
 			.patch('/contacts/-1')
 			.set('x-access-token', jwt)
 			.send(payload);
 
-		expect(result.status).toEqual(404);
+		expect(status).toEqual(404);
 	});
 
 	it(`PATCH /contacts/:id - should return statusCode 400 (${STATUS_CODES[400]})`, async () => {
 		const payload = { name: 'Luiz' };
 
-		const result = await request(app)
+		const { status } = await request(app)
 			.patch('/contacts/abc')
 			.set('x-access-token', jwt)
 			.send(payload);
 
-		expect(result.status).toEqual(400);
+		expect(status).toEqual(400);
 	});
 });

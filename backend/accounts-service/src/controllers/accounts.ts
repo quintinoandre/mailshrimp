@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 
+import { IAccount } from '@models/account';
 import {
 	findAll,
 	findByEmail,
@@ -8,7 +9,6 @@ import {
 	set,
 	remove,
 } from '@models/accountRepository';
-import { IAccount } from '@models/accounts';
 import { Token } from '@ms-commons/api/auth';
 import { getToken } from '@ms-commons/api/controllers/controller';
 
@@ -18,8 +18,8 @@ async function getAccounts(_req: Request, res: Response, _next: any) {
 	const accounts = await findAll();
 
 	res.json(
-		accounts.map((item) => {
-			const account = item;
+		accounts.map((_account) => {
+			const account = _account;
 
 			account.password = '';
 
@@ -34,9 +34,9 @@ async function getAccount({ params }: Request, res: Response, _next: any) {
 
 		if (!id) return res.status(400).json({ message: 'id is required!' }); //! Bad Request
 
-		const token = getToken(res) as Token;
+		const { accountId } = getToken(res) as Token;
 
-		if (id !== token.accountId) return res.sendStatus(403); //! Forbidden
+		if (id !== accountId) return res.sendStatus(403); //! Forbidden
 
 		const account = await findById(id);
 
@@ -80,9 +80,9 @@ async function setAccount(
 
 		if (!id) return res.status(400).json({ message: 'id is required!' }); //! Bad Request
 
-		const token = getToken(res) as Token;
+		const { accountId } = getToken(res) as Token;
 
-		if (id !== token.accountId) return res.sendStatus(403); //! Forbidden
+		if (id !== accountId) return res.sendStatus(403); //! Forbidden
 
 		const accountParams = body as IAccount;
 
@@ -108,9 +108,7 @@ async function setAccount(
 
 async function loginAccount({ body }: Request, res: Response, _next: any) {
 	try {
-		const loginParams = body as IAccount;
-
-		const { email, password: loginPassword } = loginParams;
+		const { email, password: loginPassword } = body as IAccount;
 
 		const account = await findByEmail(email);
 
@@ -146,9 +144,9 @@ async function deleteAccount({ params }: Request, res: Response, _next: any) {
 
 		if (!id) return res.status(400).json({ message: 'id is required!' }); //! Bad Request
 
-		const token = getToken(res) as Token;
+		const { accountId } = getToken(res) as Token;
 
-		if (id !== token.accountId) return res.sendStatus(403); //! Forbidden
+		if (id !== accountId) return res.sendStatus(403); //! Forbidden
 
 		await remove(id);
 

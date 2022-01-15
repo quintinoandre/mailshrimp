@@ -1,5 +1,5 @@
+import { IContact } from './contact';
 import contactModel, { IContactModel } from './contactModel';
-import { IContact } from './contacts';
 
 function findAll(accountId: number) {
 	return contactModel.findAll<IContactModel>({ where: { accountId } });
@@ -12,13 +12,13 @@ function findById(contactId: number, accountId: number) {
 }
 
 async function add(contact: IContact, accountId: number) {
-	const newContact = { ...contact };
+	const newContact = contact;
 
 	newContact.accountId = accountId;
 
-	const result = await contactModel.create(newContact);
+	const { id } = await contactModel.create(newContact);
 
-	newContact.id = result.id;
+	newContact.id = id;
 
 	return newContact;
 }
@@ -40,9 +40,9 @@ async function set(contactId: number, contact: IContact, accountId: number) {
 		if (newContact.status && newContact.status !== originalContact.status)
 			originalContact.status = newContact.status;
 
-		const result = await originalContact.save();
+		const { id } = await originalContact.save();
 
-		newContact.id = result.id;
+		newContact.id = id;
 
 		return newContact;
 	}

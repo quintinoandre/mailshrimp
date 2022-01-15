@@ -1,15 +1,15 @@
 import { Request, Response } from 'express';
 
+import { IContact } from '@models/contact';
 import { add, findAll, findById, set } from '@models/contactRepository';
-import { IContact } from '@models/contacts';
 import { Token } from '@ms-commons/api/auth';
 import { getToken } from '@ms-commons/api/controllers/controller';
 
 async function getContacts(_req: Request, res: Response, _next: any) {
 	try {
-		const token = getToken(res) as Token;
+		const { accountId } = getToken(res) as Token;
 
-		const contacts = await findAll(token.accountId);
+		const contacts = await findAll(accountId);
 
 		res.status(200).json(contacts); //* OK
 	} catch (error) {
@@ -25,9 +25,9 @@ async function getContact({ params }: Request, res: Response, _next: any) {
 
 		if (!id) return res.status(400).json({ message: 'id is required!' }); //! Bad Request
 
-		const token = getToken(res) as Token;
+		const { accountId } = getToken(res) as Token;
 
-		const contact = await findById(id, token.accountId);
+		const contact = await findById(id, accountId);
 
 		if (!contact) return res.sendStatus(404); //! Not Found
 
@@ -41,11 +41,11 @@ async function getContact({ params }: Request, res: Response, _next: any) {
 
 async function addContact({ body }: Request, res: Response, _next: any) {
 	try {
-		const token = getToken(res) as Token;
+		const { accountId } = getToken(res) as Token;
 
 		const contact = body as IContact;
 
-		const result = await add(contact, token.accountId);
+		const result = await add(contact, accountId);
 
 		res.status(201).json(result); //* Created
 	} catch (error) {
@@ -65,11 +65,11 @@ async function setContact(
 
 		if (!id) return res.status(400).json({ message: 'id is required!' }); //! Bad Request
 
-		const token = getToken(res) as Token;
+		const { accountId } = getToken(res) as Token;
 
 		const contact = body as IContact;
 
-		const result = await set(id, contact, token.accountId);
+		const result = await set(id, contact, accountId);
 
 		if (!result) return res.sendStatus(404); //! Not Found
 

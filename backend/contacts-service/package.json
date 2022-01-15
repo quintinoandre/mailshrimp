@@ -22,7 +22,7 @@
 		"express": "^4.17.2",
 		"joi": "^17.5.0",
 		"mysql2": "^2.3.3",
-		"sequelize": "^6.12.5",
+		"sequelize": "^6.3.5",
 		"ts-jest": "^27.1.2",
 		"ts-node": "^10.4.0",
 		"tsconfig-paths": "^3.12.0"

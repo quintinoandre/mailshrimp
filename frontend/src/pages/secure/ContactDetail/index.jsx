@@ -18,7 +18,6 @@ function RenderContact({ contact: { name, email, phone } }) {
 class ContactDetail extends React.Component {
 	constructor(props) {
 		super(props);
-
 		this.state = { isLoading: true, contact: null };
 	}
 

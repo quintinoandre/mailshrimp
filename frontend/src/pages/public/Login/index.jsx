@@ -24,9 +24,11 @@ class Login extends React.Component {
 			try {
 				const service = new AccountService();
 
-				const response = await service.login(email, password);
+				const {
+					data: { token },
+				} = await service.login(email, password);
 
-				login(response.data.token);
+				login(token);
 
 				const { history } = this.props;
 

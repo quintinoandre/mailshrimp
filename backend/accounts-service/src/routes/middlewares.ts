@@ -33,9 +33,9 @@ function validateAuthorization({ params }: Request, res: Response, next: any) {
 
 	if (!id) return res.status(400).end(); //! Bad Request
 
-	const token = getToken(res) as Token;
+	const { accountId } = getToken(res) as Token;
 
-	if (id !== token.accountId) return res.status(403).end(); //! Forbidden
+	if (id !== accountId) return res.status(403).end(); //! Forbidden
 
 	return next();
 }

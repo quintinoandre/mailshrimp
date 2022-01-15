@@ -3,7 +3,7 @@ import express, { Router } from 'express';
 import helmet from 'helmet';
 import morgan from 'morgan';
 
-const { CORS_ORIGIN, MS_NAME } = process.env;
+const { CORS_ORIGIN, MS_NAME, MORGAN_FORMAT } = process.env;
 
 function getCorsOrigin() {
 	if (!CORS_ORIGIN) throw new Error('CORS_ORIGIN is required env var!');
@@ -16,14 +16,11 @@ function getCorsOrigin() {
 export default (router: Router) => {
 	const app = express();
 
-	app.use(morgan('dev'));
+	app.use(morgan(MORGAN_FORMAT));
 
 	app.use(helmet());
 
-	const corsOptions = {
-		origin: getCorsOrigin(),
-		optionsSuccessStatus: 200,
-	};
+	const corsOptions = { origin: getCorsOrigin(), optionsSuccessStatus: 200 };
 
 	app.use(cors(corsOptions));
 
