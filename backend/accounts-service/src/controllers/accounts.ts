@@ -12,6 +12,7 @@ import {
 import { AccountStatus } from '@models/accountStatus';
 import { Token } from '@ms-commons/api/auth';
 import { getToken } from '@ms-commons/api/controllers/controller';
+import { addEmailIdentity } from '@ms-commons/clients/emailService';
 
 import { comparePassword, hashPassword, sign } from '../auth';
 
@@ -64,6 +65,12 @@ async function addAccount({ body }: Request, res: Response, _next: any) {
 		const result = await add(newAccount);
 
 		result.password = '';
+
+		newAccount.id = result.id;
+
+		// newAccount.settings = await addEmailService(newAccount.domain);
+
+		await addEmailIdentity(newAccount.domain);
 
 		res.status(201).json(result); //* Created
 	} catch (error) {
