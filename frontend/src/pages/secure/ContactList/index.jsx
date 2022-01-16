@@ -6,11 +6,19 @@ import ContactsService from '../../../services/contacts';
 import Header from '../../../shared/header';
 import { PageContent } from '../../../shared/styles';
 
+function RenderEmptyRow({ message }) {
+	return (
+		<tr>
+			<td colSpan="2">{message}</td>
+		</tr>
+	);
+}
+
 function RenderLine({ contact: { id, email, name } }) {
 	const { url } = useRouteMatch();
 
 	return (
-		<tr key={id}>
+		<tr>
 			<td>
 				<Link to={`${url}/${id}`}>{email}</Link>
 			</td>
@@ -29,19 +37,25 @@ function RenderTable({ contacts }) {
 				</tr>
 			</thead>
 			<tbody>
-				{contacts.map((item) => (
-					<RenderLine key={item.id} contact={item} />
-				))}
+				{!contacts.length ? (
+					<RenderEmptyRow message="No contact available." />
+				) : (
+					contacts.map((contact) => (
+						<RenderLine key={contact.id} contact={contact} />
+					))
+				)}
 			</tbody>
 		</Table>
 	);
 }
 
-function RenderEmptyRow() {
+function RenderButtonAdd() {
+	const { url } = useRouteMatch();
+
 	return (
-		<Col>
-			<p colSpan="2">No contact available.</p>
-		</Col>
+		<Link className="btn btn-success float-end" to={`${url}/add`}>
+			Add Contact
+		</Link>
 	);
 }
 
@@ -68,20 +82,16 @@ class Contacts extends React.Component {
 				<Header />
 				<PageContent>
 					<Container>
-						<Row>
+						<Row className="mb-3">
 							<Col>
 								<h3>Contacts</h3>
 							</Col>
 							<Col>
-								<Link className="btn btn-success float-end" to="/contacts/add">
-									Add Contact
-								</Link>
+								<RenderButtonAdd />
 							</Col>
 						</Row>
-						<p>List of registered contacts.</p>
-						{!contacts.length ? (
-							<RenderEmptyRow />
-						) : isLoading ? (
+						<p>List of registered contacts:</p>
+						{isLoading ? (
 							<p>Loading...</p>
 						) : (
 							<RenderTable contacts={contacts} />

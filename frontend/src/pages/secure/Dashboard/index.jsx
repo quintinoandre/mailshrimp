@@ -12,7 +12,7 @@ class Dashboard extends React.Component {
 				<Header />
 				<PageContent>
 					<Container>
-						<h2>Dashboard</h2>
+						<h2 className="mb-3">Dashboard</h2>
 						<p>
 							Here we can list the latest submissions, added contacts or
 							statistics
