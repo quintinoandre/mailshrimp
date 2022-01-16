@@ -6,6 +6,34 @@ import MessageService from '../../../services/messages';
 import Header from '../../../shared/header/index';
 import { PageContent } from '../../../shared/styles';
 
+function RenderMessageStatus({ status }) {
+	let statusName = {};
+
+	switch (status) {
+		case 100:
+			statusName = { title: 'CREATED', css: 'primary' };
+			break;
+
+		case 200:
+			statusName = { title: 'SENT', css: 'success' };
+			break;
+
+		case 300:
+			statusName = { title: 'REMOVED', css: 'danger' };
+			break;
+
+		default:
+			statusName = { title: 'UNDEFINED', css: 'secondary' };
+			break;
+	}
+
+	return (
+		<Badge pill bg={statusName.css}>
+			{statusName.title}
+		</Badge>
+	);
+}
+
 function RenderEmptyRow({ message }) {
 	return (
 		<tr>
@@ -22,7 +50,9 @@ function RenderLine({ message: { id, subject, status } }) {
 			<td>
 				<Link to={`${url}/${id}`}>{subject}</Link>
 			</td>
-			<td>{status}</td>
+			<td>
+				<RenderMessageStatus status={status} />
+			</td>
 		</tr>
 	);
 }

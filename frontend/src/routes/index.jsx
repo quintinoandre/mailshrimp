@@ -12,6 +12,7 @@ import ContactsAddPage from '../pages/secure/ContactAdd';
 import ContactsDetailPage from '../pages/secure/ContactDetail';
 import ContactsListPage from '../pages/secure/ContactList';
 import DashboardPage from '../pages/secure/Dashboard';
+import MessageDetailPage from '../pages/secure/MessageDetail';
 import MessageListPage from '../pages/secure/MessageList';
 import RoutePrivate from './route-wrapper';
 
@@ -28,12 +29,12 @@ function Routes() {
 					component={ContactsDetailPage}
 				/>
 				<RoutePrivate exact path="/messages" component={MessageListPage} />
-				{/* <RoutePrivate exact path="/messages/add" component={MessageAddPage} />
+				{/* <RoutePrivate exact path="/messages/add" component={MessageAddPage} /> */}
 				<RoutePrivate
 					exact
 					path="/messages/:messageId"
 					component={MessageDetailPage}
-				/> */}
+				/>
 				<Route exact path="/login" component={LoginPage} />
 				<Route exact path="/signup" component={SignUpPage} />
 			</Switch>
