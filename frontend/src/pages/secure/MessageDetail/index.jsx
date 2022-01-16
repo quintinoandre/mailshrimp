@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container, Badge } from 'react-bootstrap';
+import { Container, Badge, Button } from 'react-bootstrap';
 import { withRouter } from 'react-router-dom';
 
 import MessageService from '../../../services/messages';
@@ -38,7 +38,7 @@ function RenderMessage({ message: { subject, body, status } }) {
 	return (
 		<>
 			<RenderMessageStatus status={status} />
-			<p>
+			<p className="mt-3">
 				<b>Subject:</b>
 				<br />
 				{subject}
@@ -77,6 +77,20 @@ class MessageDetail extends React.Component {
 		this.setState({ message: result, isLoading: false });
 	}
 
+	handleSendMessage = async (messageId) => {
+		this.setState({ isSending: true });
+
+		const service = new MessageService();
+
+		await service.send(messageId);
+
+		this.setState({ isSending: false });
+
+		const { history } = this.props;
+
+		history.push('messages');
+	};
+
 	render() {
 		const { message, isLoading, isSending } = this.state;
 
@@ -85,11 +99,21 @@ class MessageDetail extends React.Component {
 				<Header />
 				<PageContent>
 					<Container>
-						<h3>Message details</h3>
+						<h3 className="mb-3">Message details</h3>
 						{isLoading ? (
 							<p>Loading...</p>
 						) : (
-							<RenderMessage message={message} />
+							<>
+								<RenderMessage message={message} />
+								<Button
+									className="mt-3"
+									disabled={isSending}
+									variant="primary"
+									onClick={() => this.handleSendMessage(message.id)}
+								>
+									{isSending ? 'Sending...' : 'Send Message'}
+								</Button>
+							</>
 						)}
 					</Container>
 				</PageContent>

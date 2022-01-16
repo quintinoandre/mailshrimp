@@ -8,9 +8,21 @@ import { PageContent } from '../../../shared/styles';
 function RenderContact({ contact: { name, email, phone } }) {
 	return (
 		<>
-			<p>Name: {name}</p>
-			<p>E-mail: {email}</p>
-			<p>Phone: {phone}</p>
+			<p>
+				<b>Name:</b>
+				<br />
+				{name}
+			</p>
+			<p>
+				<b>E-mail:</b>
+				<br />
+				{email}
+			</p>
+			<p>
+				<b>Phone:</b>
+				<br />
+				{phone}
+			</p>
 		</>
 	);
 }
@@ -48,7 +60,7 @@ class ContactDetail extends React.Component {
 				<Header />
 				<PageContent>
 					<Container>
-						<h3>Contact Details</h3>
+						<h3 className="mb-3">Contact Details</h3>
 						{isLoading ? (
 							<p>Loading...</p>
 						) : (
