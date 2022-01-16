@@ -9,9 +9,12 @@ import {
 	removeById,
 } from '@models/messageRepository';
 import { MessageStatus } from '@models/messageStatus';
+import { IQueueMessage } from '@models/queueMessage';
 import { Token } from '@ms-commons/api/auth';
 import { getToken } from '@ms-commons/api/controllers/controller';
 import { getContacts } from '@ms-commons/clients/contactsService';
+
+import queueService from '../queueService';
 
 async function getMessages({ query }: Request, res: Response, _next: any) {
 	try {
@@ -125,31 +128,40 @@ async function deleteMessage(
 
 async function sendMessage({ params }: Request, res: Response, _next: any) {
 	try {
-		// obtendo a mensagem
+		// ? obter a mensagem
 		const id = parseInt(params.id);
 
 		if (!id) return res.status(400).json({ message: 'id is required!' }); //! Bad Request
 
 		const { accountId, jwt } = getToken(res) as Token;
 
-		const message = findById(id, accountId);
+		const message = await findById(id, accountId);
 
 		if (!message) return res.sendStatus(403); //! Forbidden
 
-		// obtendos os contactos
+		// ? obter os contactos
 		const contacts = await getContacts(jwt);
 
 		if (!contacts || contacts.length < 1) return res.sendStatus(400); //! Bad Request
 
-		// TODO: enviar a mensagem para os contactos
+		// ? enviar as mensagens para a fila
+		const promises = contacts.map((contact) => {
+			return queueService.sendMessage({
+				accountId,
+				contactId: contact.id,
+				messageId: id,
+			} as IQueueMessage);
+		});
 
-		// atualizando a mensagem
+		await Promise.all(promises);
+
+		// ? atualizar a mensagem
 		const messageParams = {
 			status: MessageStatus.SENT,
 			sendDate: new Date(),
 		} as IMessage;
 
-		const updatedMessage = set(id, messageParams, accountId);
+		const updatedMessage = await set(id, messageParams, accountId);
 
 		if (updatedMessage) return res.status(200).json(updatedMessage); //* OK
 

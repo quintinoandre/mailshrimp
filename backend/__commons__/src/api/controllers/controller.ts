@@ -5,7 +5,7 @@ import { Token } from '../auth';
 function getToken(res: Response) {
 	const payload = res.locals.payload as Token;
 
-	if (!payload || !payload.accountId) return res.status(401).end(); //! Unauthorized
+	if (!payload || !payload.accountId) return res.sendStatus(401); //! Unauthorized
 
 	return payload;
 }

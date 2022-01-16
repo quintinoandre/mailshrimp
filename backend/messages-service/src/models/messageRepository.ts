@@ -46,27 +46,25 @@ async function set(messageId: number, message: IMessage, accountId: number) {
 		where: { id: messageId, accountId },
 	});
 
-	if (originalMessage) {
-		if (newMessage.subject && newMessage.subject !== originalMessage.subject)
-			originalMessage.subject = newMessage.subject;
+	if (!originalMessage) return null;
 
-		if (newMessage.body && newMessage.body !== originalMessage.body)
-			originalMessage.body = newMessage.body;
+	if (newMessage.subject && newMessage.subject !== originalMessage.subject)
+		originalMessage.subject = newMessage.subject;
 
-		if (newMessage.status && newMessage.status !== originalMessage.status)
-			originalMessage.status = newMessage.status;
+	if (newMessage.body && newMessage.body !== originalMessage.body)
+		originalMessage.body = newMessage.body;
 
-		if (newMessage.sendDate && newMessage.sendDate !== originalMessage.sendDate)
-			originalMessage.sendDate = newMessage.sendDate;
+	if (newMessage.status && newMessage.status !== originalMessage.status)
+		originalMessage.status = newMessage.status;
 
-		const { id } = await originalMessage.save();
+	if (newMessage.sendDate && newMessage.sendDate !== originalMessage.sendDate)
+		originalMessage.sendDate = newMessage.sendDate;
 
-		newMessage.id = id;
+	const { id } = await originalMessage.save();
 
-		return newMessage;
-	}
+	newMessage.id = id;
 
-	return null;
+	return newMessage;
 }
 
 function removeById(messageId: number, accountId: number) {

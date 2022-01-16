@@ -32,6 +32,6 @@ router.patch(
 
 router.delete('/messages/:id', validateAuth, deleteMessage);
 
-router.post('messages/:id/send', validateAuth, sendMessage);
+router.post('/messages/:id/send', validateAuth, sendMessage);
 
 export default router;

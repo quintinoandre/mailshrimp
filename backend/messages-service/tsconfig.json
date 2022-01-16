@@ -19,10 +19,19 @@
 		"paths": {
 			"@controllers/*": [
 				"../accounts-service/src/controllers/*",
+				"../contacts-service/src/controllers/*",
 				"./src/controllers/*"
 			],
-			"@models/*": ["../accounts-service/src/models/*", "./src/models/*"],
-			"@routes/*": ["../accounts-service/src/routes/*", "./src/routes/*"],
+			"@models/*": [
+				"../accounts-service/src/models/*",
+				"../contacts-service/src/models/*",
+				"./src/models/*"
+			],
+			"@routes/*": [
+				"../accounts-service/src/routes/*",
+				"../contacts-service/src/routes/*",
+				"./src/routes/*"
+			],
 			"@ms-commons/*": ["../__commons__/src/*"]
 		}
 	},

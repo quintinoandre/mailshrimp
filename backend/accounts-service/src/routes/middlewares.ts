@@ -31,11 +31,11 @@ async function validateAuthentication(req: Request, res: Response, next: any) {
 function validateAuthorization({ params }: Request, res: Response, next: any) {
 	const id = parseInt(params.id);
 
-	if (!id) return res.status(400).end(); //! Bad Request
+	if (!id) return res.sendStatus(400); //! Bad Request
 
 	const { accountId } = getToken(res) as Token;
 
-	if (id !== accountId) return res.status(403).end(); //! Forbidden
+	if (id !== accountId) return res.sendStatus(403); //! Forbidden
 
 	return next();
 }
