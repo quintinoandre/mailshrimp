@@ -9,6 +9,7 @@ import { BoxContent, BoxForm } from '../../../shared/styles';
 class SignUp extends React.Component {
 	constructor(props) {
 		super(props);
+
 		this.state = {
 			name: '',
 			email: '',

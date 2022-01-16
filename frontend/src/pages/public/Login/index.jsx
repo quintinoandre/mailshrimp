@@ -10,6 +10,7 @@ import { BoxContent, BoxForm } from '../../../shared/styles';
 class Login extends React.Component {
 	constructor(props) {
 		super(props);
+
 		this.state = { email: '', password: '', error: '' };
 	}
 

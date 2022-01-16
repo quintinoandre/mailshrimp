@@ -48,6 +48,7 @@ function RenderEmptyRow() {
 class Contacts extends React.Component {
 	constructor(props) {
 		super(props);
+
 		this.state = { isLoading: true, contacts: [] };
 	}
 
