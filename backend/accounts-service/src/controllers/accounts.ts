@@ -12,7 +12,10 @@ import {
 import { AccountStatus } from '@models/accountStatus';
 import { Token } from '@ms-commons/api/auth';
 import { getToken } from '@ms-commons/api/controllers/controller';
-import { creatAccountSettings } from '@ms-commons/clients/emailService';
+import {
+	creatAccountSettings,
+	removeEmailIdentity,
+} from '@ms-commons/clients/emailService';
 
 import { comparePassword, hashPassword, sign } from '../auth';
 
@@ -120,21 +123,21 @@ async function loginAccount({ body }: Request, res: Response, _next: any) {
 
 		const account = await findByEmail(email);
 
-		const { id, password: accountPassword } = account;
+		if (!account) return res.sendStatus(404); //! Not Found
 
-		if (account) {
-			const isValid = comparePassword(loginPassword, accountPassword);
+		const { id, password: accountPassword, status } = account;
 
-			if (isValid) {
-				const token = sign(id);
+		const isValid =
+			comparePassword(loginPassword, accountPassword) &&
+			status !== AccountStatus.REMOVED;
 
-				return res.json({ auth: true, token }); //* OK
-			}
+		if (isValid) {
+			const token = sign(id);
 
-			return res.sendStatus(401); //! Unauthorized
+			return res.json({ auth: true, token }); //* OK
 		}
 
-		return res.sendStatus(404); //! Not Found
+		return res.sendStatus(401); //! Unauthorized
 	} catch (error) {
 		console.error(`loginAccount: ${error}`);
 
@@ -160,6 +163,12 @@ async function deleteAccount(
 
 		if (id !== accountId) return res.sendStatus(403); //! Forbidden
 
+		const account = await findById(accountId);
+
+		if (!account) return res.sendStatus(404); //! Not Found
+
+		await removeEmailIdentity(account.domain);
+
 		if (force === 'true') {
 			await removeById(id);
 
@@ -170,7 +179,13 @@ async function deleteAccount(
 
 		const updatedAccount = await set(id, accountParams);
 
-		return res.status(200).json(updatedAccount); //* OK
+		if (updatedAccount) {
+			updatedAccount.password = '';
+
+			return res.status(200).json(updatedAccount); //* OK
+		}
+
+		return res.end();
 	} catch (error) {
 		console.error(`deleteAccount: ${error}`);
 

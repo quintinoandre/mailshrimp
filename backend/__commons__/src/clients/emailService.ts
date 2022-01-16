@@ -71,7 +71,7 @@ function getSPFSettings(
 	const mx = {
 		type: 'MX',
 		name: `mailshrimp.${domain}`,
-		value: `feedback-smtp.${process.env.AWS_SES_REGION}.amazonses.com`,
+		value: `feedback-smtp.${AWS_SES_REGION}.amazonses.com`,
 		priority: 10,
 	} as DnsRecord;
 
@@ -144,4 +144,25 @@ async function creatAccountSettings(domain: string) {
 	return accountSettings;
 }
 
-export { addEmailIdentity, creatAccountSettings, getAccountSettings };
+async function removeEmailIdentity(domainOrEmail: string) {
+	const ses = new AWS.SESV2();
+
+	const params = { EmailIdentity: domainOrEmail };
+
+	try {
+		const result = await ses.deleteEmailIdentity(params).promise();
+
+		return result;
+	} catch ({ error }) {
+		if (error.statusCode === 404) return true;
+
+		throw error;
+	}
+}
+
+export {
+	addEmailIdentity,
+	creatAccountSettings,
+	getAccountSettings,
+	removeEmailIdentity,
+};
