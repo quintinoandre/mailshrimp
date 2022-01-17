@@ -6,7 +6,7 @@ import { describe, expect, it, beforeAll, afterAll } from '@jest/globals';
 import app from '../src/app';
 import { sign } from '../src/auth';
 import { IAccount } from '../src/models/account';
-import { add, removeByEmail } from '../src/models/accountRepository';
+import accountRepository from '../src/models/accountRepository';
 import { AccountStatus } from '../src/models/accountStatus';
 
 const TEST_EMAIL = 'jest@accounts.com';
@@ -25,7 +25,7 @@ beforeAll(async () => {
 		domain: 'jest.com',
 	};
 
-	const result = await add(testAccount);
+	const result = await accountRepository.add(testAccount);
 
 	testId = result.id;
 
@@ -33,9 +33,9 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-	await removeByEmail(TEST_EMAIL);
+	await accountRepository.removeByEmail(TEST_EMAIL);
 
-	await removeByEmail(TEST_EMAIL2);
+	await accountRepository.removeByEmail(TEST_EMAIL2);
 });
 
 describe('Testing routes of accounts', () => {
@@ -53,7 +53,7 @@ describe('Testing routes of accounts', () => {
 			name: 'jest2',
 			email: TEST_EMAIL2,
 			password: TEST_PASSWORD,
-			domain: 'jest.com',
+			domain: 'jest2.com',
 		};
 
 		const {

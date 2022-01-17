@@ -45,9 +45,6 @@ async function set(id: number, account: IAccount) {
 		if (newAccount.password && newAccount.password !== originalAccount.password)
 			originalAccount.password = newAccount.password;
 
-		if (newAccount.domain && newAccount.domain !== originalAccount.domain)
-			originalAccount.domain = newAccount.domain;
-
 		if (newAccount.status && newAccount.status !== originalAccount.status)
 			originalAccount.status = newAccount.status;
 

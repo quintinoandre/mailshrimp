@@ -6,7 +6,7 @@ import { describe, expect, it, beforeAll, afterAll } from '@jest/globals';
 import app from '../src/app';
 import { sign } from '../src/auth';
 import { IAccount } from '../src/models/account';
-import { add, removeByEmail } from '../src/models/accountRepository';
+import accountRepository from '../src/models/accountRepository';
 
 const TEST_EMAIL = 'jest@accounts.auth.com';
 const HASH_TEST_PASSWORD =
@@ -23,7 +23,7 @@ beforeAll(async () => {
 		domain: 'jest.com',
 	};
 
-	const result = await add(testAccount);
+	const result = await accountRepository.add(testAccount);
 
 	testAccountId = result.id;
 
@@ -31,7 +31,7 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-	await removeByEmail(TEST_EMAIL);
+	await accountRepository.removeByEmail(TEST_EMAIL);
 });
 
 describe('Testing routes of authentication', () => {
