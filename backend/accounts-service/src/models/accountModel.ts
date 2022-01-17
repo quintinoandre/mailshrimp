@@ -3,6 +3,7 @@ import Sequelize, { Model, Optional } from 'sequelize';
 import database from '@ms-commons/data/db';
 
 import { IAccount } from './account';
+import AccountEmail from './accountEmailModel';
 
 type IAccountCreationAttributes = Optional<IAccount, 'id'>;
 interface IAccountModel
@@ -24,10 +25,10 @@ const Account = database.define<IAccountModel>('account', {
 		allowNull: false,
 		defaultValue: 100,
 	},
-	domain: { type: Sequelize.STRING(100), allowNull: false },
+	domain: { type: Sequelize.STRING(100), allowNull: false, unique: true },
 });
 
-Account.sync();
+Account.hasMany(AccountEmail, { constraints: true, foreignKey: 'accountId' });
 
 export { IAccountModel };
 
