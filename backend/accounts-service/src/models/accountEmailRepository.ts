@@ -44,4 +44,4 @@ function removeByEmail(email: string, accountId: number) {
 	return accountEmailModel.destroy({ where: { email, accountId } });
 }
 
-export { findByEmail, findById, add, set, remove, removeByEmail };
+export default { findByEmail, findById, add, set, remove, removeByEmail };

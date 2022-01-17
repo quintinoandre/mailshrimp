@@ -10,6 +10,7 @@ import {
 	deleteAccount,
 	getAccountSettings,
 	createAccountSettings,
+	addAccountEmail,
 } from '@controllers/accounts';
 import {
 	validateAccountSchema,
@@ -17,6 +18,7 @@ import {
 	validateLoginSchema,
 	validateAuthentication,
 	validateAuthorization,
+	validateAccountEmailSchema,
 } from '@routes/middlewares';
 
 const router = Router();
@@ -38,6 +40,13 @@ router.patch(
 	validateAuthorization,
 	validateUpdateAccountSchema,
 	setAccount
+);
+
+router.put(
+	'accounts/settings/accountEmails',
+	validateAuthentication,
+	validateAccountEmailSchema,
+	addAccountEmail
 );
 
 router.post(

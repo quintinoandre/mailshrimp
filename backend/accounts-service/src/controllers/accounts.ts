@@ -1,14 +1,9 @@
 import { Request, Response } from 'express';
 
 import { IAccount } from '@models/account';
-import {
-	findAll,
-	findByEmail,
-	findById,
-	add,
-	set,
-	removeById,
-} from '@models/accountRepository';
+import { IAccountEmail } from '@models/accountEmail';
+import accountEmailRepository from '@models/accountEmailRepository';
+import accountRepository from '@models/accountRepository';
 import { AccountStatus } from '@models/accountStatus';
 import { Token } from '@ms-commons/api/auth';
 import { getToken } from '@ms-commons/api/controllers/controller';
@@ -21,7 +16,7 @@ import { comparePassword, hashPassword, sign } from '../auth';
 async function getAccounts({ query }: Request, res: Response, _next: any) {
 	const includeRemoved = query.includeRemoved === 'true';
 
-	const accounts = await findAll(includeRemoved);
+	const accounts = await accountRepository.findAll(includeRemoved);
 
 	res.json(
 		accounts.map((_account) => {
@@ -44,7 +39,7 @@ async function getAccount({ params }: Request, res: Response, _next: any) {
 
 		if (id !== accountId) return res.sendStatus(403); //! Forbidden
 
-		const account = await findById(id);
+		const account = await accountRepository.findById(id);
 
 		if (!account) return res.sendStatus(404); //! Not Found
 
@@ -64,7 +59,7 @@ async function addAccount({ body }: Request, res: Response, _next: any) {
 
 		newAccount.password = hashPassword(newAccount.password);
 
-		const result = await add(newAccount);
+		const result = await accountRepository.add(newAccount);
 
 		result.password = '';
 
@@ -102,7 +97,7 @@ async function setAccount(
 
 		if (password) accountParams.password = hashPassword(password);
 
-		const updatedAccount = await set(id, accountParams);
+		const updatedAccount = await accountRepository.set(id, accountParams);
 
 		if (updatedAccount) {
 			updatedAccount.password = '';
@@ -122,7 +117,7 @@ async function loginAccount({ body }: Request, res: Response, _next: any) {
 	try {
 		const { email, password: loginPassword } = body as IAccount;
 
-		const account = await findByEmail(email);
+		const account = await accountRepository.findByEmail(email);
 
 		if (!account) return res.sendStatus(404); //! Not Found
 
@@ -164,21 +159,21 @@ async function deleteAccount(
 
 		if (id !== accountId) return res.sendStatus(403); //! Forbidden
 
-		const account = await findById(accountId);
+		const account = await accountRepository.findById(accountId);
 
 		if (!account) return res.sendStatus(404); //! Not Found
 
 		await emailService.removeEmailIdentity(account.domain);
 
 		if (force === 'true') {
-			await removeById(id);
+			await accountRepository.removeById(id);
 
 			return res.sendStatus(204); // * No content
 		}
 
 		const accountParams = { status: AccountStatus.REMOVED } as IAccount;
 
-		const updatedAccount = await set(id, accountParams);
+		const updatedAccount = await accountRepository.set(id, accountParams);
 
 		if (updatedAccount) {
 			updatedAccount.password = '';
@@ -198,13 +193,22 @@ async function getAccountSettings(_req: Request, res: Response, _next: any) {
 	try {
 		const { accountId } = getToken(res) as Token;
 
-		const account = await findById(accountId);
+		const account = await accountRepository.findByIdWithEmails(accountId);
 
 		if (!account) return res.sendStatus(404); //! Not Found
 
+		let emails: string[] = [];
+
+		const accountEmails = account.get('accountEmails', {
+			plain: true,
+		}) as IAccountEmail[];
+
+		if (accountEmails && accountEmails.length > 0)
+			emails = accountEmails.map((accountEmail) => accountEmail.email);
+
 		const { domain } = account;
 
-		const settings = await emailService.getAccountSettings(domain);
+		const settings = await emailService.getAccountSettings(domain, emails);
 
 		return res.status(200).json(settings); //* OK
 	} catch (error) {
@@ -222,7 +226,7 @@ async function createAccountSettings(
 	try {
 		const { accountId } = getToken(res) as Token;
 
-		const account = await findById(accountId);
+		const account = await accountRepository.findById(accountId);
 
 		if (!account) return res.sendStatus(404); //! Not Found
 
@@ -232,7 +236,7 @@ async function createAccountSettings(
 
 		if (force === 'true') await emailService.removeEmailIdentity(domain);
 		else {
-			accountSettings = await emailService.getAccountSettings(domain);
+			accountSettings = await emailService.getAccountSettings(domain, []);
 
 			if (accountSettings) return res.status(200).json(accountSettings); //* OK
 		}
@@ -242,6 +246,54 @@ async function createAccountSettings(
 		return res.status(201).json(accountSettings); //* Created
 	} catch (error) {
 		console.error(`createAccountSettings: ${error}`);
+
+		return res.sendStatus(400); //! Bad Request
+	}
+}
+
+async function addAccountEmail({ body }: Request, res: Response, _next: any) {
+	const accountEmail = body as IAccountEmail;
+
+	const { accountId } = getToken(res) as Token;
+
+	try {
+		const account = await accountRepository.findByIdWithEmails(accountId);
+
+		if (!account) return res.sendStatus(404); //! Not Found
+
+		const { domain } = account;
+
+		if (!accountEmail.email.endsWith(`@${domain}`)) return res.sendStatus(403); //! Forbidden
+
+		const accountEmails = account.get('accountEmails', {
+			plain: true,
+		}) as IAccountEmail[];
+
+		let alreadyExists = false;
+
+		if (accountEmails && accountEmails.length > 0)
+			alreadyExists = accountEmails.some(
+				(item) => item.email === accountEmail.email
+			);
+
+		if (alreadyExists) return res.sendStatus(400); //! Bad Request
+
+		accountEmail.accountId = accountId;
+
+		const { id } = await accountEmailRepository.add(accountEmail);
+
+		if (!id) return res.sendStatus(400); //! Bad Request
+
+		accountEmail.id = id;
+
+		await emailService.addEmailIdentity(accountEmail.email);
+
+		return res.status(201).json(accountEmail); //* Created
+	} catch (error) {
+		console.error(`addAccountEmail: ${error}`);
+
+		if (accountEmail.id)
+			await accountEmailRepository.remove(accountEmail.id, accountId);
 
 		return res.sendStatus(400); //! Bad Request
 	}
@@ -257,4 +309,5 @@ export {
 	deleteAccount,
 	getAccountSettings,
 	createAccountSettings,
+	addAccountEmail,
 };

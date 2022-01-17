@@ -1,6 +1,10 @@
 import { Request, Response } from 'express';
 
 import {
+	accountEmailSchema,
+	accountEmailUpdateSchema,
+} from '@models/accountEmailShcemas';
+import {
 	accountSchema,
 	accountUpdateSchema,
 	loginSchema,
@@ -11,6 +15,18 @@ import {
 	validateSchema,
 	validateAuth,
 } from '@ms-commons/api/routes/middlewares';
+
+function validateAccountEmailSchema(req: Request, res: Response, next: any) {
+	return validateSchema(accountEmailSchema, req, res, next);
+}
+
+function validateAccountEmailUpdateSchema(
+	req: Request,
+	res: Response,
+	next: any
+) {
+	return validateSchema(accountEmailUpdateSchema, req, res, next);
+}
 
 function validateAccountSchema(req: Request, res: Response, next: any) {
 	return validateSchema(accountSchema, req, res, next);
@@ -41,6 +57,8 @@ function validateAuthorization({ params }: Request, res: Response, next: any) {
 }
 
 export {
+	validateAccountEmailSchema,
+	validateAccountEmailUpdateSchema,
 	validateAccountSchema,
 	validateUpdateAccountSchema,
 	validateLoginSchema,

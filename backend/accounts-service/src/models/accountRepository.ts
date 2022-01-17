@@ -1,6 +1,7 @@
 import { DestroyOptions } from 'sequelize/dist';
 
 import { IAccount } from './account';
+import AccountEmailModel from './accountEmailModel';
 import accountModel, { IAccountModel } from './accountModel';
 import { AccountStatus } from './accountStatus';
 
@@ -20,6 +21,12 @@ function findByEmail(email: string) {
 
 function findById(id: number) {
 	return accountModel.findByPk<IAccountModel>(id);
+}
+
+function findByIdWithEmails(id: number) {
+	return accountModel.findByPk<IAccountModel>(id, {
+		include: AccountEmailModel,
+	});
 }
 
 function add(account: IAccount) {
@@ -62,4 +69,13 @@ function removeByEmail(email: string) {
 	return accountModel.destroy({ where: { email } } as DestroyOptions<IAccount>);
 }
 
-export { findAll, findByEmail, findById, add, set, removeById, removeByEmail };
+export default {
+	findAll,
+	findByEmail,
+	findById,
+	findByIdWithEmails,
+	add,
+	set,
+	removeById,
+	removeByEmail,
+};
