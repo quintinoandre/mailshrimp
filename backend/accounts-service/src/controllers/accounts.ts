@@ -299,6 +299,128 @@ async function addAccountEmail({ body }: Request, res: Response, _next: any) {
 	}
 }
 
+async function getAccountEmails(_req: Request, res: Response, _next: any) {
+	try {
+		const { accountId } = getToken(res) as Token;
+
+		const account = await accountRepository.findByIdWithEmails(accountId);
+
+		if (!account) return res.sendStatus(404); //! Not Found
+
+		let emails: string[] = [];
+
+		const accountEmails = account.get('accountEmails', {
+			plain: true,
+		}) as IAccountEmail[];
+
+		if (accountEmails && accountEmails.length > 0)
+			emails = accountEmails.map((accountEmail) => accountEmail.email);
+
+		const settings = await emailService.getEmailSettings(emails);
+
+		return res.status(200).json(settings); //* OK
+	} catch (error) {
+		console.error(`getAccountsEmails: ${error}`);
+
+		return res.sendStatus(400); //! Bad Request
+	}
+}
+
+async function getAccountEmail({ params }: Request, res: Response, _next: any) {
+	try {
+		const id = parseInt(params.id);
+
+		if (!id) return res.status(400).json({ message: 'id is required!' }); //! Bad Request
+
+		const { accountId } = getToken(res) as Token;
+
+		const accountEmail = (await accountEmailRepository.findById(
+			id,
+			accountId,
+			true
+		)) as IAccountEmail;
+
+		if (!accountEmail) return res.sendStatus(404); //! Not Found
+
+		const settings = await emailService.getEmailSettings([accountEmail.email]);
+
+		if (!settings || settings.length < 1) return res.sendStatus(404); //! Not Found
+
+		// eslint-disable-next-line prefer-destructuring
+		accountEmail.settings = settings[0];
+
+		return res.status(200).json(accountEmail); //* OK
+	} catch (error) {
+		console.error(`getAccountEmail: ${error}`);
+
+		return res.sendStatus(400); //! Bad Request
+	}
+}
+
+async function setAccountEmail(
+	{ body, params }: Request,
+	res: Response,
+	_next: any
+) {
+	try {
+		const id = parseInt(params.id);
+
+		if (!id) return res.status(400).json({ message: 'id is required!' }); //! Bad Request
+
+		const { accountId } = getToken(res) as Token;
+
+		if (id !== accountId) return res.sendStatus(403); //! Forbidden
+
+		const accountEmailParams = body as IAccountEmail;
+
+		const updatedAccountEmail = await accountEmailRepository.set(
+			id,
+			accountId,
+			accountEmailParams
+		);
+
+		if (updatedAccountEmail) return res.status(200).json(updatedAccountEmail); //* OK
+
+		return res.sendStatus(404); //! Not Found
+	} catch (error) {
+		console.error(`setAccountEmail: ${error}`);
+
+		return res.sendStatus(400); //! Bad Request
+	}
+}
+
+async function deleteAccountEmail(
+	{ params, query: { force } }: Request,
+	res: Response,
+	_next: any
+) {
+	try {
+		const id = parseInt(params.id);
+
+		if (!id) return res.status(400).json({ message: 'id is required!' }); //! Bad Request
+
+		const { accountId } = getToken(res) as Token;
+
+		const accountEmail = await accountEmailRepository.findById(
+			id,
+			accountId,
+			true
+		);
+
+		if (!accountEmail) return res.sendStatus(404); //! Not Found
+
+		await emailService.removeEmailIdentity(accountEmail.email);
+
+		await accountEmailRepository.remove(id, accountId);
+
+		return res.sendStatus(204); // * No content
+	} catch (error) {
+		console.error(`deleteAccountEmail: ${error}`);
+
+		return res.sendStatus(400); //! Bad Request
+	}
+}
+
 export {
 	getAccounts,
 	getAccount,
@@ -310,4 +432,8 @@ export {
 	getAccountSettings,
 	createAccountSettings,
 	addAccountEmail,
+	getAccountEmails,
+	getAccountEmail,
+	setAccountEmail,
+	deleteAccountEmail,
 };
