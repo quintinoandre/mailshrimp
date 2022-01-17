@@ -160,7 +160,7 @@ async function removeEmailIdentity(domainOrEmail: string) {
 	}
 }
 
-export {
+export default {
 	addEmailIdentity,
 	creatAccountSettings,
 	getAccountSettings,

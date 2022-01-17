@@ -8,6 +8,8 @@ import {
 	loginAccount,
 	logoutAccount,
 	deleteAccount,
+	getAccountSettings,
+	createAccountSettings,
 } from '@controllers/accounts';
 import {
 	validateAccountSchema,
@@ -19,7 +21,7 @@ import {
 
 const router = Router();
 
-router.get('/accounts/', validateAuthentication, getAccounts);
+router.get('/accounts/settings', validateAuthentication, getAccountSettings);
 
 router.get(
 	'/accounts/:id',
@@ -28,12 +30,20 @@ router.get(
 	getAccount
 );
 
+router.get('/accounts/', validateAuthentication, getAccounts);
+
 router.patch(
 	'/accounts/:id',
 	validateAuthentication,
 	validateAuthorization,
 	validateUpdateAccountSchema,
 	setAccount
+);
+
+router.post(
+	'/accounts/settings',
+	validateAuthentication,
+	createAccountSettings
 );
 
 router.post('/accounts/', validateAccountSchema, addAccount);

@@ -12,9 +12,8 @@ import {
 import { AccountStatus } from '@models/accountStatus';
 import { Token } from '@ms-commons/api/auth';
 import { getToken } from '@ms-commons/api/controllers/controller';
-import {
-	creatAccountSettings,
-	removeEmailIdentity,
+import emailService, {
+	AccountSettings,
 } from '@ms-commons/clients/emailService';
 
 import { comparePassword, hashPassword, sign } from '../auth';
@@ -71,7 +70,9 @@ async function addAccount({ body }: Request, res: Response, _next: any) {
 
 		newAccount.id = result.id;
 
-		newAccount.settings = await creatAccountSettings(newAccount.domain);
+		newAccount.settings = await emailService.creatAccountSettings(
+			newAccount.domain
+		);
 
 		res.status(201).json(result); //* Created
 	} catch (error) {
@@ -167,7 +168,7 @@ async function deleteAccount(
 
 		if (!account) return res.sendStatus(404); //! Not Found
 
-		await removeEmailIdentity(account.domain);
+		await emailService.removeEmailIdentity(account.domain);
 
 		if (force === 'true') {
 			await removeById(id);
@@ -193,6 +194,59 @@ async function deleteAccount(
 	}
 }
 
+async function getAccountSettings(_req: Request, res: Response, _next: any) {
+	try {
+		const { accountId } = getToken(res) as Token;
+
+		const account = await findById(accountId);
+
+		if (!account) return res.sendStatus(404); //! Not Found
+
+		const { domain } = account;
+
+		const settings = await emailService.getAccountSettings(domain);
+
+		return res.status(200).json(settings); //* OK
+	} catch (error) {
+		console.error(`getAccountSettings: ${error}`);
+
+		return res.sendStatus(400); //! Bad Request
+	}
+}
+
+async function createAccountSettings(
+	{ query: { force } }: Request,
+	res: Response,
+	_next: any
+) {
+	try {
+		const { accountId } = getToken(res) as Token;
+
+		const account = await findById(accountId);
+
+		if (!account) return res.sendStatus(404); //! Not Found
+
+		let accountSettings: AccountSettings;
+
+		const { domain } = account;
+
+		if (force === 'true') await emailService.removeEmailIdentity(domain);
+		else {
+			accountSettings = await emailService.getAccountSettings(domain);
+
+			if (accountSettings) return res.status(200).json(accountSettings); //* OK
+		}
+
+		accountSettings = await emailService.creatAccountSettings(domain);
+
+		return res.status(201).json(accountSettings); //* Created
+	} catch (error) {
+		console.error(`createAccountSettings: ${error}`);
+
+		return res.sendStatus(400); //! Bad Request
+	}
+}
+
 export {
 	getAccounts,
 	getAccount,
@@ -201,4 +255,6 @@ export {
 	loginAccount,
 	logoutAccount,
 	deleteAccount,
+	getAccountSettings,
+	createAccountSettings,
 };
