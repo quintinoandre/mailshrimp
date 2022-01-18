@@ -1,5 +1,6 @@
 import React from 'react';
 import { Container, Row, Col, Table, Badge } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 
 import SettingsService from '../../../services/settings';
 import Header from '../../../shared/header';
@@ -121,6 +122,9 @@ class SettingsDetails extends React.Component {
 						) : (
 							<>
 								<p>List of email addresses configured as sender:</p>
+								<Link className="btn btn-success mb-4" to="settings/email/add">
+									Add Sender
+								</Link>
 								<Table striped bordered hover>
 									<thead>
 										<tr>

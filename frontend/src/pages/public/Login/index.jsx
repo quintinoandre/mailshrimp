@@ -12,9 +12,11 @@ class Login extends React.Component {
 		super(props);
 
 		this.state = { email: '', password: '', error: '' };
+
+		this.handleSubmit = this.handleSubmit.bind(this);
 	}
 
-	handleLogin = async (event) => {
+	handleSubmit = async (event) => {
 		event.preventDefault();
 
 		const { email, password } = this.state;
@@ -57,7 +59,7 @@ class Login extends React.Component {
 						<BoxForm>
 							<h2>Login</h2>
 							<p>Enter your data to authenticate:</p>
-							<Form onSubmit={this.handleLogin}>
+							<Form onSubmit={this.handleSubmit}>
 								{error && this.renderError()}
 								<Form.Group controlId="emailGroup" className="mb-3">
 									<Form.Label>E-mail</Form.Label>

@@ -18,9 +18,11 @@ class SignUp extends React.Component {
 			error: '',
 			isLoading: false,
 		};
+
+		this.handleSubmit = this.handleSubmit.bind(this);
 	}
 
-	handleSignUp = async (event) => {
+	handleSubmit = async (event) => {
 		event.preventDefault();
 
 		const { name, email, password, domain, isLoading } = this.state;
@@ -65,7 +67,7 @@ class SignUp extends React.Component {
 						<BoxForm>
 							<h2>Sign Up</h2>
 							<p>Enter all fields to register.</p>
-							<Form onSubmit={this.handleSignUp}>
+							<Form onSubmit={this.handleSubmit}>
 								{error && this.renderError()}
 								<Form.Group controlId="nameGroup" className="mb-3">
 									<Form.Label>Name</Form.Label>

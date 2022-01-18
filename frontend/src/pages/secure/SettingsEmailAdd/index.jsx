@@ -1,22 +1,16 @@
 import React from 'react';
-import { Container, Button, Form, Alert, Row, Col } from 'react-bootstrap';
+import { Container, Form, Alert, Button, Row, Col } from 'react-bootstrap';
 import { withRouter, Link } from 'react-router-dom';
 
-import ContactService from '../../../services/contacts';
+import SettinsgService from '../../../services/settings';
 import Header from '../../../shared/header';
 import { PageContent } from '../../../shared/styles';
 
-class ContactAdd extends React.Component {
+class SettingsEmailAdd extends React.Component {
 	constructor(props) {
 		super(props);
 
-		this.state = {
-			name: '',
-			email: '',
-			phone: '',
-			error: '',
-			isLoading: false,
-		};
+		this.state = { isLoading: false, name: '', email: '', error: '' };
 
 		this.handleSubmit = this.handleSubmit.bind(this);
 	}
@@ -26,26 +20,26 @@ class ContactAdd extends React.Component {
 
 		const { history } = this.props;
 
-		const { name, email, phone } = this.state;
+		const { name, email } = this.state;
 
-		if (!name || !email || !phone)
-			this.setState({ error: 'Enter all fields to add the contact' });
+		if (!name || !email)
+			this.setState({ error: 'Enter all fields to add the sender' });
 		else {
 			try {
 				this.setState({ isLoading: true });
 
-				const service = new ContactService();
+				const service = new SettinsgService();
 
-				await service.add({ name, email, phone });
+				await service.addAccountEmail({ name, email });
 
 				this.setState({ isLoading: false });
 
-				history.push('/contacts');
+				history.push('/settings');
 			} catch (error) {
 				console.error(error);
 
 				this.setState({
-					error: 'An error occurred while creating the contact.',
+					error: 'An error occurred while creating the sender.',
 				});
 			}
 		}
@@ -67,8 +61,12 @@ class ContactAdd extends React.Component {
 					<Container>
 						<Row>
 							<Col>
-								<h3>Add Contact</h3>
-								<p>Enter all fields to add the contact.</p>
+								<h3>Add Sender</h3>
+								<p>Enter all fields to add the sender.</p>
+								<p>
+									You will receive an email from AWS with the link to confirm
+									the email, click the link to activate.
+								</p>
 							</Col>
 						</Row>
 						<Row>
@@ -79,7 +77,7 @@ class ContactAdd extends React.Component {
 										<Form.Label>Name</Form.Label>
 										<Form.Control
 											type="text"
-											placeholder="Enter a name"
+											placeholder="Inform the name"
 											onChange={(event) =>
 												this.setState({ name: event.target.value })
 											}
@@ -88,27 +86,17 @@ class ContactAdd extends React.Component {
 									<Form.Group className="mb-3">
 										<Form.Label>E-mail</Form.Label>
 										<Form.Control
-											type="email"
+											type="text"
 											placeholder="email@yourdomain.com"
 											onChange={(event) =>
 												this.setState({ email: event.target.value })
 											}
 										/>
 									</Form.Group>
-									<Form.Group className="mb-3">
-										<Form.Label>Phone</Form.Label>
-										<Form.Control
-											type="text"
-											placeholder="Enter a phone number"
-											onChange={(event) =>
-												this.setState({ phone: event.target.value })
-											}
-										/>
-									</Form.Group>
 									<Button className="mb-3" variant="primary" type="submit">
-										Add Contact
+										Add Sender
 									</Button>
-									<Link className="btn btn-default mb-3" to="/contacts">
+									<Link className="btn btn-default mb-3" to="/settings">
 										Go back
 									</Link>
 								</Form>
@@ -122,4 +110,4 @@ class ContactAdd extends React.Component {
 	}
 }
 
-export default withRouter(ContactAdd);
+export default withRouter(SettingsEmailAdd);
