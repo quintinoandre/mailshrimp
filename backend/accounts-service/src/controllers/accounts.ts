@@ -5,7 +5,7 @@ import { IAccountEmail } from '@models/accountEmail';
 import accountEmailRepository from '@models/accountEmailRepository';
 import accountRepository from '@models/accountRepository';
 import { AccountStatus } from '@models/accountStatus';
-import { Token } from '@ms-commons/api/auth';
+import { Token } from '@ms-commons/api/auth/accountsAuth';
 import { getToken } from '@ms-commons/api/controllers/controller';
 import emailService, {
 	AccountSettings,

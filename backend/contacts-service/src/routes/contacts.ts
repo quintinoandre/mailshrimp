@@ -7,7 +7,7 @@ import {
 	setContact,
 	deleteContact,
 } from '@controllers/contacts';
-import { validateAuth } from '@ms-commons/api/routes/middlewares';
+import { validateAccountAuth } from '@ms-commons/api/routes/middlewares';
 
 import {
 	validateContactSchema,
@@ -16,19 +16,24 @@ import {
 
 const router = Router();
 
-router.get('/contacts/:id', validateAuth, getContact);
+router.get('/contacts/:id', validateAccountAuth, getContact);
 
-router.get('/contacts/', validateAuth, getContacts);
+router.get('/contacts/', validateAccountAuth, getContacts);
 
-router.post('/contacts/', validateAuth, validateContactSchema, addContact);
+router.post(
+	'/contacts/',
+	validateAccountAuth,
+	validateContactSchema,
+	addContact
+);
 
 router.patch(
 	'/contacts/:id',
-	validateAuth,
+	validateAccountAuth,
 	validateUpdateContactSchema,
 	setContact
 );
 
-router.delete('/contacts/:id', validateAuth, deleteContact);
+router.delete('/contacts/:id', validateAccountAuth, deleteContact);
 
 export default router;

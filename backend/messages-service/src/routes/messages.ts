@@ -9,7 +9,10 @@ import {
 	scheduleMessage,
 	sendMessage,
 } from '@controllers/messages';
-import { validateAuth } from '@ms-commons/api/routes/middlewares';
+import {
+	validateAccountAuth,
+	validateMicroserviceAuth,
+} from '@ms-commons/api/routes/middlewares';
 
 import {
 	validateMessageSchema,
@@ -22,19 +25,24 @@ const router = Router();
  * GET /messages/:id
  * Returns one message from this account
  */
-router.get('/messages/:id', validateAuth, getMessage);
+router.get('/messages/:id', validateAccountAuth, getMessage);
 
 /**
  * GET /messages/
  * Returns all messages from this account
  */
-router.get('/messages/', validateAuth, getMessages);
+router.get('/messages/', validateAccountAuth, getMessages);
 
 /**
  * POST /messages/
  * Add one message to this account
  */
-router.post('/messages/', validateAuth, validateMessageSchema, addMessage);
+router.post(
+	'/messages/',
+	validateAccountAuth,
+	validateMessageSchema,
+	addMessage
+);
 
 /**
  * PATCH /messages/:id
@@ -42,7 +50,7 @@ router.post('/messages/', validateAuth, validateMessageSchema, addMessage);
  */
 router.patch(
 	'/messages/:id',
-	validateAuth,
+	validateAccountAuth,
 	validateUpdateMessageSchema,
 	setMessage
 );
@@ -51,20 +59,20 @@ router.patch(
  * DELETE /messages/:id
  * Remove one message from this account
  */
-router.delete('/messages/:id', validateAuth, deleteMessage);
+router.delete('/messages/:id', validateAccountAuth, deleteMessage);
 
 /**
  * POST /messages/:id/send
  * Front-end calls this route to send a message to a bunch of contacts.
  * In fact, the messages will be queued.
  */
-router.post('/messages/:id/send', validateAuth, scheduleMessage);
+router.post('/messages/:id/send', validateAccountAuth, scheduleMessage);
 
 /**
  * POST /messages/send
  * AWS Lambda calls this route to send a message from the queue to one contact.
  * The back-end will send the email.
  */
-router.post('/messages/sending', sendMessage);
+router.post('/messages/sending', validateMicroserviceAuth, sendMessage);
 
 export default router;

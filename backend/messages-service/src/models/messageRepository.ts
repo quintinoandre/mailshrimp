@@ -21,7 +21,7 @@ async function findById(messageId: number, accountId: number) {
 
 		return message;
 	} catch (error) {
-		console.log(`messageRepository.findById: ${error}`);
+		console.error(`messageRepository.findById: ${error}`);
 
 		return null;
 	}

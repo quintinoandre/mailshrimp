@@ -9,7 +9,7 @@ import {
 	set,
 } from '@models/contactRepository';
 import { ContactStatus } from '@models/contactStatus';
-import { Token } from '@ms-commons/api/auth';
+import { Token } from '@ms-commons/api/auth/accountsAuth';
 import { getToken } from '@ms-commons/api/controllers/controller';
 
 async function getContacts({ query }: Request, res: Response, _next: any) {

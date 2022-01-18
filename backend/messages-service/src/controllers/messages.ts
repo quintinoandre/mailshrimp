@@ -5,7 +5,7 @@ import messageRepository from '@models/messageRepository';
 import { MessageStatus } from '@models/messageStatus';
 import sendingRepository from '@models/sendingRepository';
 import { SendingStatus } from '@models/sendingStatus';
-import { Token } from '@ms-commons/api/auth';
+import { Token } from '@ms-commons/api/auth/accountsAuth';
 import { getToken } from '@ms-commons/api/controllers/controller';
 import { getContacts } from '@ms-commons/clients/contactsService';
 import queueService from '@ms-commons/clients/queueService';
@@ -216,6 +216,10 @@ async function scheduleMessage(
 	}
 }
 
+async function sendMessage(req: Request, res: Response, _next: any) {
+	// TODO: a implementar
+}
+
 export {
 	getMessages,
 	getMessage,
@@ -223,4 +227,5 @@ export {
 	setMessage,
 	deleteMessage,
 	scheduleMessage,
+	sendMessage,
 };

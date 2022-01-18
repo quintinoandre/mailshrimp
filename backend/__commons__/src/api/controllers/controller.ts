@@ -1,6 +1,6 @@
 import { Response } from 'express';
 
-import { Token } from '../auth';
+import { Token } from '../auth/accountsAuth';
 
 function getToken(res: Response) {
 	const payload = res.locals.payload as Token;

@@ -9,11 +9,11 @@ import {
 	accountUpdateSchema,
 	loginSchema,
 } from '@models/accountSchemas';
-import { Token } from '@ms-commons/api/auth';
+import { Token } from '@ms-commons/api/auth/accountsAuth';
 import { getToken } from '@ms-commons/api/controllers/controller';
 import {
 	validateSchema,
-	validateAuth,
+	validateAccountAuth,
 } from '@ms-commons/api/routes/middlewares';
 
 function validateAccountEmailSchema(req: Request, res: Response, next: any) {
@@ -41,7 +41,7 @@ function validateLoginSchema(req: Request, res: Response, next: any) {
 }
 
 async function validateAuthentication(req: Request, res: Response, next: any) {
-	return validateAuth(req, res, next);
+	return validateAccountAuth(req, res, next);
 }
 
 function validateAuthorization(

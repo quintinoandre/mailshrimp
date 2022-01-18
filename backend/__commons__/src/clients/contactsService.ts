@@ -19,7 +19,7 @@ async function getContacts(jwt: string) {
 
 		return data as Array<IContact>;
 	} catch (error) {
-		console.log(`contactService.getContacts: ${error}`);
+		console.error(`contactService.getContacts: ${error}`);
 
 		return null;
 	}

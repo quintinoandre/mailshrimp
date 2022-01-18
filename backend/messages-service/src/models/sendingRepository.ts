@@ -23,7 +23,7 @@ async function findQueuedOne(
 
 		return sending;
 	} catch (error) {
-		console.log(`findQueuedOne: ${error}`);
+		console.error(`findQueuedOne: ${error}`);
 
 		return null;
 	}
@@ -37,7 +37,7 @@ async function findByMessageId(messageId: number, accountId: number) {
 
 		return sendings;
 	} catch (error) {
-		console.log(`findByMessageId: ${error}`);
+		console.error(`findByMessageId: ${error}`);
 
 		return null;
 	}
@@ -51,7 +51,7 @@ async function findByContactId(contactId: number, accountId: number) {
 
 		return sendings;
 	} catch (error) {
-		console.log(`findByContactId: ${error}`);
+		console.error(`findByContactId: ${error}`);
 
 		return null;
 	}
