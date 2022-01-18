@@ -90,7 +90,7 @@ class SignUp extends React.Component {
 								<Form.Group controlId="domainGroup" className="mb-3">
 									<Form.Label>Domain</Form.Label>
 									<Form.Control
-										type="url"
+										type="text"
 										placeholder="Enter your domain"
 										onChange={(event) =>
 											this.setState({ domain: event.target.value })

@@ -14,6 +14,7 @@ import ContactsListPage from '../pages/secure/ContactList';
 import DashboardPage from '../pages/secure/Dashboard';
 import MessageDetailPage from '../pages/secure/MessageDetail';
 import MessageListPage from '../pages/secure/MessageList';
+import SettingsDetailPage from '../pages/secure/SettingsDetails';
 import RoutePrivate from './route-wrapper';
 
 function Routes() {
@@ -35,6 +36,7 @@ function Routes() {
 					path="/messages/:messageId"
 					component={MessageDetailPage}
 				/>
+				<RoutePrivate exact path="/settings" component={SettingsDetailPage} />
 				<Route exact path="/login" component={LoginPage} />
 				<Route exact path="/signup" component={SignUpPage} />
 			</Switch>
