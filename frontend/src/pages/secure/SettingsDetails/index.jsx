@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container, Row, Col, Table } from 'react-bootstrap';
+import { Container, Row, Col, Table, Badge } from 'react-bootstrap';
 
 import SettingsService from '../../../services/settings';
 import Header from '../../../shared/header';
@@ -9,11 +9,7 @@ class SettingsDetails extends React.Component {
 	constructor(props) {
 		super(props);
 
-		this.state = {
-			isLoading: true,
-			dnsSettings: null,
-			emailAddress: [],
-		};
+		this.state = { isLoading: true, dnsSettings: null };
 	}
 
 	async componentDidMount() {
@@ -118,6 +114,29 @@ class SettingsDetails extends React.Component {
 								</Table>
 							</>
 						)}
+
+						<h4>Email addresses</h4>
+						{isLoading ? (
+							<p>Loading...</p>
+						) : (
+							<>
+								<p>List of email addresses configured as sender:</p>
+								<Table striped bordered hover>
+									<thead>
+										<tr>
+											<th>E-mail</th>
+										</tr>
+									</thead>
+									<tbody>
+										{!isLoading ? (
+											<RenderEmails records={dnsSettings.EmailAddress} />
+										) : (
+											<RenderLoaderRow />
+										)}
+									</tbody>
+								</Table>
+							</>
+						)}
 					</Container>
 				</PageContent>
 			</>
@@ -125,8 +144,35 @@ class SettingsDetails extends React.Component {
 	}
 }
 
+function RenderEmails({ records }) {
+	return (
+		// eslint-disable-next-line react/jsx-no-useless-fragment
+		<>
+			{records.length < 1 ? (
+				<RenderEmptyRow message="No registered email." />
+			) : (
+				records.map((item) => (
+					<tr key={item.email}>
+						{item.email}
+						{item.verified ? (
+							<Badge className="ms-2" bg="success" pill>
+								verified email
+							</Badge>
+						) : (
+							<Badge className="ms-2" bg="warning" pill>
+								awaiting verification
+							</Badge>
+						)}
+					</tr>
+				))
+			)}
+		</>
+	);
+}
+
 function RenderLines({ records }) {
 	const { dnsRecords, verified } = records;
+
 	return (
 		<>
 			{dnsRecords.length < 1 && (
