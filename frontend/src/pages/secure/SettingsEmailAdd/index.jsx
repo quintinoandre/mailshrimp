@@ -23,7 +23,7 @@ class SettingsEmailAdd extends React.Component {
 		const { name, email } = this.state;
 
 		if (!name || !email)
-			this.setState({ error: 'Enter all fields to add the sender' });
+			this.setState({ error: 'Enter all fields to add the sender.' });
 		else {
 			try {
 				this.setState({ isLoading: true });

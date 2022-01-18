@@ -12,6 +12,7 @@ import ContactsAddPage from '../pages/secure/ContactAdd';
 import ContactsDetailPage from '../pages/secure/ContactDetail';
 import ContactsListPage from '../pages/secure/ContactList';
 import DashboardPage from '../pages/secure/Dashboard';
+import MessageAddPage from '../pages/secure/MessageAdd';
 import MessageDetailPage from '../pages/secure/MessageDetail';
 import MessageListPage from '../pages/secure/MessageList';
 import SettingsDetailPage from '../pages/secure/SettingsDetails';
@@ -31,7 +32,7 @@ function Routes() {
 					component={ContactsDetailPage}
 				/>
 				<RoutePrivate exact path="/messages" component={MessageListPage} />
-				{/* <RoutePrivate exact path="/messages/add" component={MessageAddPage} /> */}
+				<RoutePrivate exact path="/messages/add" component={MessageAddPage} />
 				<RoutePrivate
 					exact
 					path="/messages/:messageId"

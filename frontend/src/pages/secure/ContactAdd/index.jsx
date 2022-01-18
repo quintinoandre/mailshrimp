@@ -29,7 +29,7 @@ class ContactAdd extends React.Component {
 		const { name, email, phone } = this.state;
 
 		if (!name || !email || !phone)
-			this.setState({ error: 'Enter all fields to add the contact' });
+			this.setState({ error: 'Enter all fields to add the contact.' });
 		else {
 			try {
 				this.setState({ isLoading: true });
