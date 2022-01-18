@@ -6,6 +6,7 @@ import {
 	addMessage,
 	setMessage,
 	deleteMessage,
+	scheduleMessage,
 	sendMessage,
 } from '@controllers/messages';
 import { validateAuth } from '@ms-commons/api/routes/middlewares';
@@ -17,12 +18,28 @@ import {
 
 const router = Router();
 
+/**
+ * GET /messages/:id
+ * Returns one message from this account
+ */
 router.get('/messages/:id', validateAuth, getMessage);
 
+/**
+ * GET /messages/
+ * Returns all messages from this account
+ */
 router.get('/messages/', validateAuth, getMessages);
 
+/**
+ * POST /messages/
+ * Add one message to this account
+ */
 router.post('/messages/', validateAuth, validateMessageSchema, addMessage);
 
+/**
+ * PATCH /messages/:id
+ * Updates one message from this account
+ */
 router.patch(
 	'/messages/:id',
 	validateAuth,
@@ -30,8 +47,24 @@ router.patch(
 	setMessage
 );
 
+/**
+ * DELETE /messages/:id
+ * Remove one message from this account
+ */
 router.delete('/messages/:id', validateAuth, deleteMessage);
 
-router.post('/messages/:id/send', validateAuth, sendMessage);
+/**
+ * POST /messages/:id/send
+ * Front-end calls this route to send a message to a bunch of contacts.
+ * In fact, the messages will be queued.
+ */
+router.post('/messages/:id/send', validateAuth, scheduleMessage);
+
+/**
+ * POST /messages/send
+ * AWS Lambda calls this route to send a message from the queue to one contact.
+ * The back-end will send the email.
+ */
+router.post('/messages/sending', sendMessage);
 
 export default router;

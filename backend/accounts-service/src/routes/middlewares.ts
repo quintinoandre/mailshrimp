@@ -44,14 +44,18 @@ async function validateAuthentication(req: Request, res: Response, next: any) {
 	return validateAuth(req, res, next);
 }
 
-function validateAuthorization({ params }: Request, res: Response, next: any) {
-	const id = parseInt(params.id);
+function validateAuthorization(
+	{ params: { id } }: Request,
+	res: Response,
+	next: any
+) {
+	const accountId = parseInt(id);
 
-	if (!id) return res.sendStatus(400); //! Bad Request
+	if (!accountId) return res.sendStatus(400); //! Bad Request
 
-	const { accountId } = getToken(res) as Token;
+	const token = getToken(res) as Token;
 
-	if (id !== accountId) return res.sendStatus(403); //! Forbidden
+	if (accountId !== token.accountId) return res.sendStatus(403); //! Forbidden
 
 	return next();
 }

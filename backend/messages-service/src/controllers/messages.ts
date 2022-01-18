@@ -1,20 +1,14 @@
 import { Request, Response } from 'express';
 
 import { IMessage } from '@models/message';
-import {
-	add,
-	findAll,
-	findById,
-	set,
-	removeById,
-} from '@models/messageRepository';
+import messageRepository from '@models/messageRepository';
 import { MessageStatus } from '@models/messageStatus';
-import { IQueueMessage } from '@models/queueMessage';
+import sendingRepository from '@models/sendingRepository';
+import { SendingStatus } from '@models/sendingStatus';
 import { Token } from '@ms-commons/api/auth';
 import { getToken } from '@ms-commons/api/controllers/controller';
 import { getContacts } from '@ms-commons/clients/contactsService';
-
-import queueService from '../queueService';
+import queueService from '@ms-commons/clients/queueService';
 
 async function getMessages({ query }: Request, res: Response, _next: any) {
 	try {
@@ -22,7 +16,7 @@ async function getMessages({ query }: Request, res: Response, _next: any) {
 
 		const { accountId } = getToken(res) as Token;
 
-		const messages = await findAll(accountId, includeRemoved);
+		const messages = await messageRepository.findAll(accountId, includeRemoved);
 
 		res.status(200).json(messages); //* OK
 	} catch (error) {
@@ -32,17 +26,25 @@ async function getMessages({ query }: Request, res: Response, _next: any) {
 	}
 }
 
-async function getMessage({ params }: Request, res: Response, _next: any) {
+async function getMessage(
+	{ params: { id } }: Request,
+	res: Response,
+	_next: any
+) {
 	try {
-		const id = parseInt(params.id);
+		const messageId = parseInt(id);
 
-		if (!id) return res.status(400).json({ message: 'id is required!' }); //! Bad Request
+		if (!messageId) return res.status(400).json({ message: 'id is required!' }); //! Bad Request
 
-		const { accountId } = getToken(res) as Token;
+		const token = getToken(res) as Token;
 
-		const message = await findById(id, accountId);
+		const message = await messageRepository.findById(
+			messageId,
+			token.accountId
+		);
 
-		if (!message) return res.sendStatus(404); //! Not Found
+		if (!message)
+			return res.status(404).json({ message: 'Message not found!' }); //! Not Found
 
 		return res.status(200).json(message); //* OK
 	} catch (error) {
@@ -58,7 +60,7 @@ async function addMessage({ body }: Request, res: Response, _next: any) {
 
 		const message = body as IMessage;
 
-		const result = await add(message, accountId);
+		const result = await messageRepository.add(message, accountId);
 
 		res.status(201).json(result); //* Created
 	} catch (error) {
@@ -69,24 +71,28 @@ async function addMessage({ body }: Request, res: Response, _next: any) {
 }
 
 async function setMessage(
-	{ body, params }: Request,
+	{ body, params: { id } }: Request,
 	res: Response,
 	_next: any
 ) {
 	try {
-		const id = parseInt(params.id);
+		const messageId = parseInt(id);
 
-		if (!id) return res.status(400).json({ message: 'id is required!' }); //! Bad Request
+		if (!messageId) return res.status(400).json({ message: 'id is required!' }); //! Bad Request
 
-		const { accountId } = getToken(res) as Token;
+		const token = getToken(res) as Token;
 
 		const message = body as IMessage;
 
-		const result = await set(id, message, accountId);
+		const result = await messageRepository.set(
+			messageId,
+			message,
+			token.accountId
+		);
 
-		if (!result) return res.sendStatus(404); //! Not Found
+		if (!result) return res.status(404).json({ message: 'Message not found!' }); //! Not Found
 
-		return res.json(result); //* OK
+		return res.status(200).json(result); //* OK
 	} catch (error) {
 		console.error(`setMessage: ${error}`);
 
@@ -95,26 +101,30 @@ async function setMessage(
 }
 
 async function deleteMessage(
-	{ params, query: { force } }: Request,
+	{ params: { id }, query: { force } }: Request,
 	res: Response,
 	_next: any
 ) {
 	try {
-		const id = parseInt(params.id);
+		const messageId = parseInt(id);
 
-		if (!id) return res.status(400).json({ message: 'id is required!' }); //! Bad Request
+		if (!messageId) return res.status(400).json({ message: 'id is required!' }); //! Bad Request
 
-		const { accountId } = getToken(res) as Token;
+		const token = getToken(res) as Token;
 
 		if (force === 'true') {
-			await removeById(id, accountId);
+			await messageRepository.removeById(messageId, token.accountId);
 
 			return res.sendStatus(204); // * No content
 		}
 
 		const messageParams = { status: MessageStatus.REMOVED } as IMessage;
 
-		const updatedContact = await set(id, messageParams, accountId);
+		const updatedContact = await messageRepository.set(
+			messageId,
+			messageParams,
+			token.accountId
+		);
 
 		if (updatedContact) return res.status(200).json(updatedContact); //* OK
 
@@ -126,44 +136,77 @@ async function deleteMessage(
 	}
 }
 
-async function sendMessage({ params }: Request, res: Response, _next: any) {
+async function scheduleMessage(
+	{ params: { id } }: Request,
+	res: Response,
+	_next: any
+) {
 	try {
 		// ? obter a mensagem
-		const id = parseInt(params.id);
+		const messageId = parseInt(id);
 
-		if (!id) return res.status(400).json({ message: 'id is required!' }); //! Bad Request
+		if (!messageId) return res.status(400).json({ message: 'id is required!' }); //! Bad Request
 
-		const { accountId, jwt } = getToken(res) as Token;
+		const token = getToken(res) as Token;
 
-		const message = await findById(id, accountId);
+		const message = await messageRepository.findById(
+			messageId,
+			token.accountId
+		);
 
 		if (!message) return res.sendStatus(403); //! Forbidden
 
 		// ? obter os contactos
-		const contacts = await getContacts(jwt);
+		const contacts = await getContacts(token.jwt);
 
-		if (!contacts || contacts.length < 1) return res.sendStatus(400); //! Bad Request
+		if (!contacts || contacts.length < 1)
+			return res
+				.status(404)
+				.json({ message: 'There are no contacts for this account!' }); //! Bad Request
+
+		// ? criar as sendings
+		const sendings = await sendingRepository.addAll(
+			contacts.map((contact) => {
+				return {
+					accountId: token.accountId,
+					contactId: contact.id,
+					messageId,
+					status: SendingStatus.QUEUED,
+				};
+			})
+		);
+
+		if (!sendings)
+			return res.status(400).json({ message: "Couldn't save the sendings!" });
+
+		// ? simplificar os sendings para fila
+		const messages = sendings.map((item) => {
+			return {
+				id: item.id,
+				accountId: item.accountId,
+				contactId: item.contactId,
+				messageId: item.messageId,
+			};
+		});
 
 		// ? enviar as mensagens para a fila
-		const promises = contacts.map((contact) => {
-			return queueService.sendMessage({
-				accountId,
-				contactId: contact.id,
-				messageId: id,
-			} as IQueueMessage);
-		});
+		const promises = queueService.sendMessageBatch(messages);
 
 		await Promise.all(promises);
 
 		// ? atualizar a mensagem
 		const messageParams = {
-			status: MessageStatus.SENT,
+			status: MessageStatus.SCHEDULE,
 			sendDate: new Date(),
 		} as IMessage;
 
-		const updatedMessage = await set(id, messageParams, accountId);
+		const updatedMessage = await messageRepository.set(
+			messageId,
+			messageParams,
+			token.accountId
+		);
 
-		if (updatedMessage) return res.status(200).json(updatedMessage); //* OK
+		if (updatedMessage) return res.status(202).json(updatedMessage); //* Accepted
 
 		return res.sendStatus(403); //! Forbidden
 	} catch (error) {
@@ -179,5 +222,5 @@ export {
 	addMessage,
 	setMessage,
 	deleteMessage,
-	sendMessage,
+	scheduleMessage,
 };

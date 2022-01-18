@@ -30,13 +30,19 @@ async function getContacts({ query }: Request, res: Response, _next: any) {
 
 async function getContact({ params }: Request, res: Response, _next: any) {
 	try {
-		const id = parseInt(params.id);
+		const contactId = parseInt(params.id);
 
-		if (!id) return res.status(400).json({ message: 'id is required!' }); //! Bad Request
+		if (!contactId) return res.status(400).json({ message: 'id is required!' }); //! Bad Request
 
-		const { accountId } = getToken(res) as Token;
+		let accountId = parseInt(params.accountId);
 
-		const contact = await findById(id, accountId);
+		if (!accountId) {
+			const token = getToken(res) as Token;
+
+			accountId = token.accountId;
+		}
+
+		const contact = await findById(contactId, accountId);
 
 		if (!contact) return res.sendStatus(404); //! Not Found
 
@@ -65,20 +71,20 @@ async function addContact({ body }: Request, res: Response, _next: any) {
 }
 
 async function setContact(
-	{ body, params }: Request,
+	{ body, params: { id } }: Request,
 	res: Response,
 	_next: any
 ) {
 	try {
-		const id = parseInt(params.id);
+		const contactId = parseInt(id);
 
-		if (!id) return res.status(400).json({ message: 'id is required!' }); //! Bad Request
+		if (!contactId) return res.status(400).json({ message: 'id is required!' }); //! Bad Request
 
-		const { accountId } = getToken(res) as Token;
+		const token = getToken(res) as Token;
 
 		const contact = body as IContact;
 
-		const result = await set(id, contact, accountId);
+		const result = await set(contactId, contact, token.accountId);
 
 		if (!result) return res.sendStatus(404); //! Not Found
 
@@ -91,26 +97,26 @@ async function setContact(
 }
 
 async function deleteContact(
-	{ params, query: { force } }: Request,
+	{ params: { id }, query: { force } }: Request,
 	res: Response,
 	_next: any
 ) {
 	try {
-		const id = parseInt(params.id);
+		const contactId = parseInt(id);
 
-		if (!id) return res.status(400).json({ message: 'id is required!' }); //! Bad Request
+		if (!contactId) return res.status(400).json({ message: 'id is required!' }); //! Bad Request
 
-		const { accountId } = getToken(res) as Token;
+		const token = getToken(res) as Token;
 
 		if (force === 'true') {
-			await removeById(id, accountId);
+			await removeById(contactId, token.accountId);
 
 			return res.sendStatus(204); // * No content
 		}
 
 		const contactParams = { status: ContactStatus.REMOVED } as IContact;
 
-		const updatedContact = await set(id, contactParams, accountId);
+		const updatedContact = await set(contactId, contactParams, token.accountId);
 
 		if (updatedContact) return res.status(200).json(updatedContact); //* OK
 

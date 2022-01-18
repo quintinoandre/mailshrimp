@@ -71,4 +71,4 @@ function removeById(messageId: number, accountId: number) {
 	return messageModel.destroy({ where: { id: messageId, accountId } });
 }
 
-export { findAll, findById, add, set, removeById };
+export default { findAll, findById, add, set, removeById };

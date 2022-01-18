@@ -29,17 +29,21 @@ async function getAccounts({ query }: Request, res: Response, _next: any) {
 	);
 }
 
-async function getAccount({ params }: Request, res: Response, _next: any) {
+async function getAccount(
+	{ params: { id } }: Request,
+	res: Response,
+	_next: any
+) {
 	try {
-		const id = parseInt(params.id);
+		const accountId = parseInt(id);
 
-		if (!id) return res.status(400).json({ message: 'id is required!' }); //! Bad Request
+		if (!accountId) return res.status(400).json({ message: 'id is required!' }); //! Bad Request
 
-		const { accountId } = getToken(res) as Token;
+		const token = getToken(res) as Token;
 
-		if (id !== accountId) return res.sendStatus(403); //! Forbidden
+		if (accountId !== token.accountId) return res.sendStatus(403); //! Forbidden
 
-		const account = await accountRepository.findById(id);
+		const account = await accountRepository.findById(accountId);
 
 		if (!account) return res.sendStatus(404); //! Not Found
 
@@ -78,18 +82,18 @@ async function addAccount({ body }: Request, res: Response, _next: any) {
 }
 
 async function deleteAccount(
-	{ params, query: { force } }: Request,
+	{ params: { id }, query: { force } }: Request,
 	res: Response,
 	_next: any
 ) {
 	try {
-		const id = parseInt(params.id);
+		const accountId = parseInt(id);
 
-		if (!id) return res.status(400).json({ message: 'id is required!' }); //! Bad Request
+		if (!accountId) return res.status(400).json({ message: 'id is required!' }); //! Bad Request
 
-		const { accountId } = getToken(res) as Token;
+		const token = getToken(res) as Token;
 
-		if (id !== accountId) return res.sendStatus(403); //! Forbidden
+		if (accountId !== token.accountId) return res.sendStatus(403); //! Forbidden
 
 		const account = await accountRepository.findByIdWithEmails(accountId);
 
@@ -112,14 +116,17 @@ async function deleteAccount(
 		await emailService.removeEmailIdentity(account.domain);
 
 		if (force === 'true') {
-			await accountRepository.removeById(id);
+			await accountRepository.removeById(accountId);
 
 			return res.sendStatus(204); // * No content
 		}
 
 		const accountParams = { status: AccountStatus.REMOVED } as IAccount;
 
-		const updatedAccount = await accountRepository.set(id, accountParams);
+		const updatedAccount = await accountRepository.set(
+			accountId,
+			accountParams
+		);
 
 		if (updatedAccount) {
 			updatedAccount.password = '';
@@ -341,14 +348,21 @@ async function getAccountEmails(_req: Request, res: Response, _next: any) {
 
 async function getAccountEmail({ params }: Request, res: Response, _next: any) {
 	try {
-		const id = parseInt(params.id);
+		let accountId = parseInt(params.accountId);
 
-		if (!id) return res.status(400).json({ message: 'id is required!' }); //! Bad Request
+		if (!accountId) {
+			const token = getToken(res) as Token;
 
-		const { accountId } = getToken(res) as Token;
+			accountId = token.accountId;
+		}
+
+		const accountEmailId = parseInt(params.accountEmailId);
+
+		if (!accountId || !accountEmailId)
+			return res.status(400).json({ message: 'Both ids are required!' }); //! Bad Request
 
 		const accountEmail = (await accountEmailRepository.findById(
-			id,
+			accountEmailId,
 			accountId,
 			true
 		)) as IAccountEmail;
@@ -371,24 +385,23 @@ async function getAccountEmail({ params }: Request, res: Response, _next: any) {
 }
 
 async function setAccountEmail(
-	{ body, params }: Request,
+	{ body, params: { id } }: Request,
 	res: Response,
 	_next: any
 ) {
 	try {
-		const id = parseInt(params.id);
+		const accountEmailId = parseInt(id);
 
-		if (!id) return res.status(400).json({ message: 'id is required!' }); //! Bad Request
+		if (!accountEmailId)
+			return res.status(400).json({ message: 'id is required!' }); //! Bad Request
 
-		const { accountId } = getToken(res) as Token;
-
-		if (id !== accountId) return res.sendStatus(403); //! Forbidden
+		const token = getToken(res) as Token;
 
 		const accountEmailParams = body as IAccountEmail;
 
 		const updatedAccountEmail = await accountEmailRepository.set(
-			id,
-			accountId,
+			accountEmailId,
+			token.accountId,
 			accountEmailParams
 		);
 
@@ -403,20 +416,21 @@ async function setAccountEmail(
 }
 
 async function deleteAccountEmail(
-	{ params, query: { force } }: Request,
+	{ params: { id } }: Request,
 	res: Response,
 	_next: any
 ) {
 	try {
-		const id = parseInt(params.id);
+		const accountEmailId = parseInt(id);
 
-		if (!id) return res.status(400).json({ message: 'id is required!' }); //! Bad Request
+		if (!accountEmailId)
+			return res.status(400).json({ message: 'id is required!' }); //! Bad Request
 
-		const { accountId } = getToken(res) as Token;
+		const token = getToken(res) as Token;
 
 		const accountEmail = await accountEmailRepository.findById(
-			id,
-			accountId,
+			accountEmailId,
+			token.accountId,
 			true
 		);
 
@@ -424,7 +438,7 @@ async function deleteAccountEmail(
 
 		await emailService.removeEmailIdentity(accountEmail.email);
 
-		await accountEmailRepository.remove(id, accountId);
+		await accountEmailRepository.remove(accountEmailId, token.accountId);
 
 		return res.sendStatus(204); // * No content
 	} catch (error) {
