@@ -17,6 +17,7 @@ import {
 import {
 	validateMessageSchema,
 	validateUpdateMessageSchema,
+	validateSendingSchema,
 } from './middlewares';
 
 const router = Router();
@@ -73,6 +74,11 @@ router.post('/messages/:id/send', validateAccountAuth, scheduleMessage);
  * AWS Lambda calls this route to send a message from the queue to one contact.
  * The back-end will send the email.
  */
-router.post('/messages/sending', validateMicroserviceAuth, sendMessage);
+router.post(
+	'/messages/sending',
+	validateMicroserviceAuth,
+	validateSendingSchema,
+	sendMessage
+);
 
 export default router;

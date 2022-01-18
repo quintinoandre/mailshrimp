@@ -1,5 +1,5 @@
 {
-  "compilerOptions": {
+	"compilerOptions": {
 		"target": "es2017",
 		"module": "commonjs",
 		"lib": ["es6"],
@@ -17,8 +17,9 @@
 		"moduleResolution": "node",
 		"baseUrl": ".",
 		"paths": {
-			"@controllers/*": ["./src/controllers/*"],
-			"@routes/*": ["./src/routes/*"]
+			"@auth/*": ["./src/api/auth/*"],
+			"@controllers/*": ["./src/api/controllers/*"],
+			"@routes/*": ["./src/api/routes/*"]
 		}
 	},
 	"include": ["src/**/*"],

@@ -15,8 +15,9 @@ module.exports = {
 			'module-resolver',
 			{
 				alias: {
-					'@controllers': './src/controllers',
-					'@routes': './src/routes',
+					'@auth': './src/api/auth',
+					'@controllers': './src/api/controllers',
+					'@routes': './src/api/routes',
 				},
 			},
 		],

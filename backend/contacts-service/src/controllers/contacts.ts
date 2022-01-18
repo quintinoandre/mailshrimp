@@ -32,7 +32,8 @@ async function getContact({ params }: Request, res: Response, _next: any) {
 	try {
 		const contactId = parseInt(params.id);
 
-		if (!contactId) return res.status(400).json({ message: 'id is required!' }); //! Bad Request
+		if (!contactId)
+			return res.status(400).json({ message: 'contact id is required!' }); //! Bad Request
 
 		let accountId = parseInt(params.accountId);
 

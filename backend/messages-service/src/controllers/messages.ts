@@ -3,11 +3,12 @@ import { Request, Response } from 'express';
 import { IMessage } from '@models/message';
 import messageRepository from '@models/messageRepository';
 import { MessageStatus } from '@models/messageStatus';
+import { ISending } from '@models/sending';
 import sendingRepository from '@models/sendingRepository';
 import { SendingStatus } from '@models/sendingStatus';
 import { Token } from '@ms-commons/api/auth/accountsAuth';
 import { getToken } from '@ms-commons/api/controllers/controller';
-import { getContacts } from '@ms-commons/clients/contactsService';
+import { getContact, getContacts } from '@ms-commons/clients/contactsService';
 import queueService from '@ms-commons/clients/queueService';
 
 async function getMessages({ query }: Request, res: Response, _next: any) {
@@ -216,8 +217,51 @@ async function scheduleMessage(
 	}
 }
 
-async function sendMessage(req: Request, res: Response, _next: any) {
-	// TODO: a implementar
+async function sendMessage(
+	{ body, params: { id, messageId, accountId, contactId } }: Request,
+	res: Response,
+	_next: any
+) {
+	try {
+		const params = body as ISending;
+
+		// ? obter o envio
+		const sending = await sendingRepository.findQueuedOne(
+			id,
+			parseInt(messageId),
+			parseInt(accountId),
+			parseInt(contactId)
+		);
+
+		if (!sending)
+			return res.status(404).json({ message: 'Sending not found!' }); //! Not Found
+
+		// TODO: implemetar cache no futuro
+		// ? obter a mensagem
+		const message = await messageRepository.findById(
+			sending.messageId,
+			sending.accountId
+		);
+
+		if (!message)
+			return res.status(404).json({ message: 'Message not found!' }); //! Not Found
+
+		// ? obter o contacto (destinatário)
+		const contact = await getContact(sending.contactId, sending.accountId);
+
+		if (!contact)
+			return res.status(404).json({ message: 'Contact not found!' }); //! Not Found
+
+		// ? obter o accountEmail (remetente)
+
+		// ? enviar o e-mail (SES)
+
+		// ? atualizar a message
+	} catch (error) {
+		console.error(`sendMessage: ${error}`);
+
+		return res.sendStatus(400); //! Bad Request
+	}
 }
 
 export {
