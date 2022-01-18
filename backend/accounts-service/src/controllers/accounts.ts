@@ -59,17 +59,17 @@ async function addAccount({ body }: Request, res: Response, _next: any) {
 
 		newAccount.password = hashPassword(newAccount.password);
 
-		const result = await accountRepository.add(newAccount);
+		const { id } = await accountRepository.add(newAccount);
 
-		result.password = '';
+		newAccount.password = '';
 
-		newAccount.id = result.id;
+		newAccount.id = id;
 
 		newAccount.settings = await emailService.creatAccountSettings(
 			newAccount.domain
 		);
 
-		res.status(201).json(result); //* Created
+		res.status(201).json(newAccount); //* Created
 	} catch (error) {
 		console.error(`addAccount: ${error}`);
 
@@ -77,8 +77,8 @@ async function addAccount({ body }: Request, res: Response, _next: any) {
 	}
 }
 
-async function setAccount(
-	{ body, params }: Request,
+async function deleteAccount(
+	{ params, query: { force } }: Request,
 	res: Response,
 	_next: any
 ) {
@@ -91,7 +91,64 @@ async function setAccount(
 
 		if (id !== accountId) return res.sendStatus(403); //! Forbidden
 
-		const accountParams = body as IAccount;
+		const account = await accountRepository.findByIdWithEmails(accountId);
+
+		if (!account) return res.sendStatus(404); //! Not Found
+
+		const accountEmails = account.get('accountEmails', {
+			plain: true,
+		}) as IAccountEmail[];
+
+		if (accountEmails && accountEmails.length > 0) {
+			const promises = accountEmails.map((accountEmail) => {
+				return emailService.removeEmailIdentity(accountEmail.email);
+			});
+
+			await Promise.all(promises);
+
+			await accountEmailRepository.removeAll(accountId);
+		}
+
+		await emailService.removeEmailIdentity(account.domain);
+
+		if (force === 'true') {
+			await accountRepository.removeById(id);
+
+			return res.sendStatus(204); // * No content
+		}
+
+		const accountParams = { status: AccountStatus.REMOVED } as IAccount;
+
+		const updatedAccount = await accountRepository.set(id, accountParams);
+
+		if (updatedAccount) {
+			updatedAccount.password = '';
+
+			return res.status(200).json(updatedAccount); //* OK
+		}
+
+		return res.end();
+	} catch (error) {
+		console.error(`deleteAccount: ${error}`);
+
+		return res.sendStatus(400); //! Bad Request
+	}
+}
+
+async function setAccount(req: Request, res: Response, next: any) {
+	try {
+		const accountParams = req.body as IAccount;
+
+		if (accountParams.status === AccountStatus.REMOVED)
+			return deleteAccount(req, res, next);
+
+		const id = parseInt(req.params.id);
+
+		if (!id) return res.status(400).json({ message: 'id is required!' }); //! Bad Request
+
+		const { accountId } = getToken(res) as Token;
+
+		if (id !== accountId) return res.sendStatus(403); //! Forbidden
 
 		const { password } = accountParams;
 
@@ -130,7 +187,7 @@ async function loginAccount({ body }: Request, res: Response, _next: any) {
 		if (isValid) {
 			const token = sign(id);
 
-			return res.json({ auth: true, token }); //* OK
+			return res.status(200).json({ auth: true, token }); //* OK
 		}
 
 		return res.sendStatus(401); //! Unauthorized
@@ -142,51 +199,7 @@ async function loginAccount({ body }: Request, res: Response, _next: any) {
 }
 
 function logoutAccount(req: Request, res: Response, _next: any) {
-	res.json({ auth: false, token: null }); //* OK
-}
-
-async function deleteAccount(
-	{ params, query: { force } }: Request,
-	res: Response,
-	_next: any
-) {
-	try {
-		const id = parseInt(params.id);
-
-		if (!id) return res.status(400).json({ message: 'id is required!' }); //! Bad Request
-
-		const { accountId } = getToken(res) as Token;
-
-		if (id !== accountId) return res.sendStatus(403); //! Forbidden
-
-		const account = await accountRepository.findById(accountId);
-
-		if (!account) return res.sendStatus(404); //! Not Found
-
-		await emailService.removeEmailIdentity(account.domain);
-
-		if (force === 'true') {
-			await accountRepository.removeById(id);
-
-			return res.sendStatus(204); // * No content
-		}
-
-		const accountParams = { status: AccountStatus.REMOVED } as IAccount;
-
-		const updatedAccount = await accountRepository.set(id, accountParams);
-
-		if (updatedAccount) {
-			updatedAccount.password = '';
-
-			return res.status(200).json(updatedAccount); //* OK
-		}
-
-		return res.end();
-	} catch (error) {
-		console.error(`deleteAccount: ${error}`);
-
-		return res.sendStatus(400); //! Bad Request
-	}
+	res.status(200).json({ auth: false, token: null }); //* OK
 }
 
 async function getAccountSettings(_req: Request, res: Response, _next: any) {
@@ -299,6 +312,128 @@ async function addAccountEmail({ body }: Request, res: Response, _next: any) {
 	}
 }
 
+async function getAccountEmails(_req: Request, res: Response, _next: any) {
+	try {
+		const { accountId } = getToken(res) as Token;
+
+		const account = await accountRepository.findByIdWithEmails(accountId);
+
+		if (!account) return res.sendStatus(404); //! Not Found
+
+		let emails: string[] = [];
+
+		const accountEmails = account.get('accountEmails', {
+			plain: true,
+		}) as IAccountEmail[];
+
+		if (accountEmails && accountEmails.length > 0)
+			emails = accountEmails.map((accountEmail) => accountEmail.email);
+
+		const settings = await emailService.getEmailSettings(emails);
+
+		return res.status(200).json(settings); //* OK
+	} catch (error) {
+		console.error(`getAccountsEmails: ${error}`);
+
+		return res.sendStatus(400); //! Bad Request
+	}
+}
+
+async function getAccountEmail({ params }: Request, res: Response, _next: any) {
+	try {
+		const id = parseInt(params.id);
+
+		if (!id) return res.status(400).json({ message: 'id is required!' }); //! Bad Request
+
+		const { accountId } = getToken(res) as Token;
+
+		const accountEmail = (await accountEmailRepository.findById(
+			id,
+			accountId,
+			true
+		)) as IAccountEmail;
+
+		if (!accountEmail) return res.sendStatus(404); //! Not Found
+
+		const settings = await emailService.getEmailSettings([accountEmail.email]);
+
+		if (!settings || settings.length < 1) return res.sendStatus(404); //! Not Found
+
+		// eslint-disable-next-line prefer-destructuring
+		accountEmail.settings = settings[0];
+
+		return res.status(200).json(accountEmail); //* OK
+	} catch (error) {
+		console.error(`getAccountEmail: ${error}`);
+
+		return res.sendStatus(400); //! Bad Request
+	}
+}
+
+async function setAccountEmail(
+	{ body, params }: Request,
+	res: Response,
+	_next: any
+) {
+	try {
+		const id = parseInt(params.id);
+
+		if (!id) return res.status(400).json({ message: 'id is required!' }); //! Bad Request
+
+		const { accountId } = getToken(res) as Token;
+
+		if (id !== accountId) return res.sendStatus(403); //! Forbidden
+
+		const accountEmailParams = body as IAccountEmail;
+
+		const updatedAccountEmail = await accountEmailRepository.set(
+			id,
+			accountId,
+			accountEmailParams
+		);
+
+		if (updatedAccountEmail) return res.status(200).json(updatedAccountEmail); //* OK
+
+		return res.sendStatus(404); //! Not Found
+	} catch (error) {
+		console.error(`setAccountEmail: ${error}`);
+
+		return res.sendStatus(400); //! Bad Request
+	}
+}
+
+async function deleteAccountEmail(
+	{ params, query: { force } }: Request,
+	res: Response,
+	_next: any
+) {
+	try {
+		const id = parseInt(params.id);
+
+		if (!id) return res.status(400).json({ message: 'id is required!' }); //! Bad Request
+
+		const { accountId } = getToken(res) as Token;
+
+		const accountEmail = await accountEmailRepository.findById(
+			id,
+			accountId,
+			true
+		);
+
+		if (!accountEmail) return res.sendStatus(404); //! Not Found
+
+		await emailService.removeEmailIdentity(accountEmail.email);
+
+		await accountEmailRepository.remove(id, accountId);
+
+		return res.sendStatus(204); // * No content
+	} catch (error) {
+		console.error(`deleteAccountEmail: ${error}`);
+
+		return res.sendStatus(400); //! Bad Request
+	}
+}
+
 export {
 	getAccounts,
 	getAccount,
@@ -310,4 +445,8 @@ export {
 	getAccountSettings,
 	createAccountSettings,
 	addAccountEmail,
+	getAccountEmails,
+	getAccountEmail,
+	setAccountEmail,
+	deleteAccountEmail,
 };

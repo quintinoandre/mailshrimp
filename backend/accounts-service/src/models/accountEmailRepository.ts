@@ -7,9 +7,10 @@ function findByEmail(email: string, accountId: number) {
 	});
 }
 
-function findById(id: number, accountId: number) {
+function findById(id: number, accountId: number, rawResult: boolean) {
 	return accountEmailModel.findOne<IAccountEmailModel>({
 		where: { id, accountId },
+		raw: rawResult || false,
 	});
 }
 
@@ -20,7 +21,7 @@ function add(accountEmail: IAccountEmail) {
 async function set(id: number, accountId: number, accountEmail: IAccountEmail) {
 	if (!accountEmail.name) return null;
 
-	const originalAccountEmail = await findById(id, accountId);
+	const originalAccountEmail = await findById(id, accountId, false);
 
 	if (
 		originalAccountEmail !== null &&
@@ -44,4 +45,16 @@ function removeByEmail(email: string, accountId: number) {
 	return accountEmailModel.destroy({ where: { email, accountId } });
 }
 
-export default { findByEmail, findById, add, set, remove, removeByEmail };
+function removeAll(accountId: number) {
+	return accountEmailModel.destroy({ where: { accountId } });
+}
+
+export default {
+	findByEmail,
+	findById,
+	add,
+	set,
+	remove,
+	removeByEmail,
+	removeAll,
+};
