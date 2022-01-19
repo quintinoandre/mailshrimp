@@ -1,2 +1,0 @@
-# mailshrimp
-MailShrimp Email Marketing

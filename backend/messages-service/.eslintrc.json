@@ -35,8 +35,8 @@
 		"no-shadow": "warn",
 		"@typescript-eslint/no-non-null-assertion": "warn",
 		"@typescript-eslint/no-inferrable-types": "warn",
-    "no-return-assign": "warn",
-    "no-param-reassign": "warn",
+		"no-return-assign": "warn",
+		"no-param-reassign": "warn",
 		"import-helpers/order-imports": [
 			"warn",
 			{
