@@ -1,30 +1,40 @@
 service: mailshrimp
+app: mailshrimp
+org: danielcsrs
 
 frameworkVersion: '2'
 
 provider:
   name: aws
-  runtime: nodejs12.x
+  stage: dev
   lambdaHashingVersion: 20201221
+  runtime: nodejs12.x
   iamRoleStatements:
     - Effect: 'Allow'
       Action:
         - 'sqs:*'
       Resource: '*'
+  environment:
+    MS_URL_MESSAGES: ${param:MS_URL_MESSAGES}
+    MS_JWT_SECRET: ${param:MS_JWT_SECRET}
+    MS_JWT_EXPIRES: ${param:MS_JWT_EXPIRES}
   tags:
     STAGE: prd
     PROJECT: mailshrimp
+    deploymentBucket:
+      name: ${self:service}-deployment
+      tags:
+        STAGE: ${self:provider.stage}
+        PROJECT: ${self:service}
 
 functions:
-  hello:
-    handler: src/handlers/hello/handler.hello
-
   send-message:
-    handler: src/handlers/send-message/handler.sendMessage
-    description: 'Send the e-mail'
-    memorySize: 128
-    timeout: 10
-    events:
-      - sqs:
-          arn: arn:aws:sqs:us-east-1:146373863002:Mailshrimp.fifo
-          batchSize: 1
+  name: ${opt:stage, self:provider.stage}-${self:service}-send-message
+  description: 'Send the e-mail'
+  handler: src/handlers/send-message/handler.sendMessage
+  memorySize: 128
+  timeout: 60
+  events:
+    - sqs:
+        arn: arn:aws:sqs:us-east-1:146373863002:Mailshrimp.fifo
+        batchSize: 1
