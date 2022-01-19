@@ -265,12 +265,12 @@ describe('Testing routes of accounts/settings/accountsEmails', () => {
 		expect(status).toEqual(422);
 	});
 
-	it(`DELETE /accounts/settings/accountEmails/:id - should return statusCode 200 (${STATUS_CODES[200]})`, async () => {
+	it(`DELETE /accounts/settings/accountEmails/:id - should return statusCode 204 (${STATUS_CODES[204]})`, async () => {
 		const { status } = await request(app)
 			.delete(`/accounts/settings/accountEmails/${testAccountEmailId2}`)
 			.set('x-access-token', jwt2);
 
-		expect(status).toEqual(200);
+		expect(status).toEqual(204);
 	});
 
 	it(`DELETE /accounts/settings/accountEmails/:id - should return statusCode 400 (${STATUS_CODES[400]})`, async () => {

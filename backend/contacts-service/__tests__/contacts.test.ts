@@ -47,6 +47,7 @@ beforeAll(async () => {
 		name: 'jest',
 		email: TEST_EMAIL,
 		phone: '00351123456789',
+		accountId: testAccountId,
 	} as IContact;
 
 	const addResult = await add(testContact, testAccountId);
