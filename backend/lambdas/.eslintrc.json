@@ -12,6 +12,7 @@
 	"rules": {
 		"prettier/prettier": "error",
 		"no-console": "warn",
+    "radix": "warn",
 		"import-helpers/order-imports": [
 			"warn",
 			{

@@ -4,7 +4,7 @@ const { MS_JWT_SECRET: SECRET, MS_JWT_EXPIRATION: EXPIRATION } = process.env;
 
 async function sign(token) {
 	try {
-		return jwt.sign(token, SECRET, { expiresIn: EXPIRATION });
+		return jwt.sign(token, SECRET, { expiresIn: parseInt(EXPIRATION) });
 	} catch (error) {
 		console.error(`sign: ${error}`);
 
