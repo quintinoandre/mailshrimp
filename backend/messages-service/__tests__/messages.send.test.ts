@@ -17,11 +17,13 @@ import { SendingStatus } from '../src/models/sendingStatus';
 
 const TEST_DOMAIN = 'jest.send.com' as string;
 const TEST_EMAIL = `jest@${TEST_DOMAIN}` as string;
+const TEST_EMAIL2 = `jest2@${TEST_DOMAIN}` as string;
 const TEST_PASSWORD = '123456' as string;
 let testAccountId = 0 as number;
 let testAccountEmailId = 0 as number;
 let testMessageId = 0 as number;
 let testContactId = 0 as number;
+let testContactId2 = 0 as number;
 let testSendingId = null as string;
 let testSendingId2 = null as string;
 let jwt = null as string;
@@ -85,6 +87,21 @@ beforeAll(async () => {
 
 	testContactId = contactResponse.body.id;
 
+	const testContact2 = {
+		accountId: testAccountId,
+		name: 'jest',
+		email: TEST_EMAIL2,
+	};
+
+	const contactResponse2 = await request(contactsApp)
+		.post('/contacts')
+		.send(testContact2)
+		.set('x-access-token', jwt);
+
+	console.log(`contactResponse2: ${contactResponse2.status}`);
+
+	testContactId2 = contactResponse2.body.id;
+
 	const testMessage = {
 		accountId: testAccountId,
 		body: 'corpo da mensagem',
@@ -117,7 +134,7 @@ beforeAll(async () => {
 	const testSending2 = {
 		accountId: testAccountId,
 		messageId: testMessageId,
-		contactId: testContactId,
+		contactId: testContactId2,
 		status: SendingStatus.QUEUED,
 		id: uuid(),
 	} as ISending;
@@ -155,6 +172,12 @@ afterAll(async () => {
 		.set('x-access-token', jwt);
 
 	console.log(`deleteContactResponse: ${deleteContactResponse.status}`);
+
+	const deleteContactResponse2 = await request(contactsApp)
+		.delete(`/contacts/${testContactId2}?force=true`)
+		.set('x-access-token', jwt);
+
+	console.log(`deleteContactResponse2: ${deleteContactResponse2.status}`);
 
 	const deleteAccountEmailResponse = await request(accountsApp)
 		.delete(`/accounts/settings/accountEmails/${testAccountEmailId}?force=true`)
@@ -236,5 +259,114 @@ describe('Testing routes of messages', () => {
 		expect(status).toEqual(202);
 		expect(id).toEqual(testSendingId);
 		expect(bodyStatus).toEqual(SendingStatus.SENT);
+	});
+
+	it(`POST /messages/sending - should return statusCode 401 (${STATUS_CODES[401]})`, async () => {
+		const { status } = await request(app).post('/messages/sending');
+
+		expect(status).toEqual(401);
+	});
+
+	it(`POST /messages/sending - should return statusCode 404 (${STATUS_CODES[404]})`, async () => {
+		const payload = {
+			id: uuid(),
+			accountId: testAccountId,
+			contactId: testContactId,
+			messageId: testMessageId,
+		} as ISending;
+
+		const msJwt = await microservicesAuth.sign(payload);
+
+		const { status } = await request(app)
+			.post('/messages/sending')
+			.set('x-access-token', `${msJwt}`)
+			.send(payload);
+
+		expect(status).toEqual(404);
+	});
+
+	it(`POST /messages/sending - should return statusCode 404 (${STATUS_CODES[404]})`, async () => {
+		const payload = {
+			id: testSendingId2,
+			accountId: 999999999,
+			contactId: testContactId,
+			messageId: testMessageId,
+		} as ISending;
+
+		const msJwt = await microservicesAuth.sign(payload);
+
+		const { status } = await request(app)
+			.post('/messages/sending')
+			.set('x-access-token', `${msJwt}`)
+			.send(payload);
+
+		expect(status).toEqual(404);
+	});
+
+	it(`POST /messages/sending - should return statusCode 404 (${STATUS_CODES[404]})`, async () => {
+		const payload = {
+			id: testSendingId2,
+			accountId: testAccountId,
+			contactId: 999999999,
+			messageId: testMessageId,
+		} as ISending;
+
+		const msJwt = await microservicesAuth.sign(payload);
+
+		const { status } = await request(app)
+			.post('/messages/sending')
+			.set('x-access-token', `${msJwt}`)
+			.send(payload);
+
+		expect(status).toEqual(404);
+	});
+
+	it(`POST /messages/sending - should return statusCode 404 (${STATUS_CODES[404]})`, async () => {
+		const payload = {
+			id: testSendingId2,
+			accountId: testAccountId,
+			contactId: testContactId,
+			messageId: 999999999,
+		} as ISending;
+
+		const msJwt = await microservicesAuth.sign(payload);
+
+		const { status } = await request(app)
+			.post('/messages/sending')
+			.set('x-access-token', `${msJwt}`)
+			.send(payload);
+
+		expect(status).toEqual(404);
+	});
+
+	it(`POST /messages/sending - should return statusCode 422 (${STATUS_CODES[422]})`, async () => {
+		const payload = { street: 'rua' };
+
+		const msJwt = await microservicesAuth.sign(payload);
+
+		const { status } = await request(app)
+			.post('/messages/sending')
+			.set('x-access-token', `${msJwt}`)
+			.send(payload);
+
+		expect(status).toEqual(422);
+	});
+
+	it(`POST /messages/sending - should return statusCode 400 (${STATUS_CODES[400]})`, async () => {
+		const payload = {
+			id: testSendingId2,
+			accountId: testAccountId,
+			contactId: testContactId2,
+			messageId: testMessageId,
+		} as ISending;
+
+		const msJwt = await microservicesAuth.sign(payload);
+
+		const { status } = await request(app)
+			.post('/messages/sending')
+			.set('x-access-token', `${msJwt}`)
+			.send(payload);
+
+		expect(status).toEqual(400);
 	});
 });

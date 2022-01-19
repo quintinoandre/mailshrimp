@@ -207,8 +207,13 @@ async function sendEmail(
 	subject: string,
 	body: string
 ) {
-	// mock (caseiro) para teste
-	/* if (fromAddress === 'jest@jest.send.com')
+	// mock (caseiro) para teste - não recomendável fazer. Deve-se fazer mocks profissionais
+	/* if (toAddress === 'jest2@jest.send.com')
+		return {
+			success: false,
+			messageId: '-1',
+		} as SendEmailResponse;
+	if (fromAddress === 'jest@jest.send.com')
 		return {
 			success: true,
 			messageId: '1',
