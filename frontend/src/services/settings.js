@@ -6,14 +6,14 @@ class SettingsService {
 		this.api = baseAPI(baseURLs.API_ACCOUNTS);
 	}
 
-	// TODO: get: configurações do domínio
+	// ? get: configurações do domínio
 	async get() {
 		const { data } = await this.api.get('accounts/settings');
 
 		return data;
 	}
 
-	// TODO: addAccountEmail: adicionar uma conta de e-mail
+	// ? addAccountEmail: adicionar uma conta de e-mail
 	async addAccountEmail(accountsEmailModel) {
 		const { data } = await this.api.put(
 			'accounts/settings/accountEmails',
@@ -23,7 +23,7 @@ class SettingsService {
 		return data;
 	}
 
-	// TODO: getOneAccountEmail: retornar uma conta de e-mail
+	// ? getOneAccountEmail: retornar uma conta de e-mail
 	async getOneAccountEmail(accountsEmailId) {
 		const { data } = this.api.get(
 			`accounts/settings/accountEmails/${accountsEmailId}`
@@ -32,7 +32,7 @@ class SettingsService {
 		return { data };
 	}
 
-	// TODO: getAllAccountEmail: retorna todas as contas de e-mail
+	// ? getAllAccountEmail: retorna todas as contas de e-mail
 	async getAllAccountEmail() {
 		const { data } = this.api.get('accounts/settings/accountEmails');
 

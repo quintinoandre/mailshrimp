@@ -5,7 +5,7 @@
  * O retorno (statusCode) dessa chamada será um 202
  */
 
-const request = require('request');
+const fetch = require('node-fetch');
 
 const sqsParse = require('../../../lib/aws-parse-sqs');
 const jwt = require('../../../lib/ms-auth');
@@ -23,29 +23,29 @@ async function main(event) {
 
 			const msJWT = await jwt.sign(payload);
 
-			const options = {
-				url: `${MS_URL_MESSAGES}/messages/sendings`,
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					'Content-Length': data.length,
-					'x-access-token': msJWT,
-				},
-				body: payload,
-				json: true,
+			const url = `${MS_URL_MESSAGES}/messages/sendings`;
+
+			const checkStatus = (res) => {
+				if (res.ok) {
+					// qualquer status >= 200 e < 300
+					return res;
+				}
+				throw Error(res.statusText);
 			};
 
-			await request(options)
-				.then((result) => {
+			fetch(url, {
+				method: 'post',
+				body: JSON.stringify(payload),
+				headers: {
+					'Content-Type': 'application/json',
+					'x-access-token': msJWT,
+				},
+			})
+				.then(checkStatus)
+				.then((res) => {
 					return {
 						statusCode: 200,
-						body: JSON.stringify({ result }),
-					};
-				})
-				.catch((error) => {
-					return {
-						statusCode: 500,
-						body: JSON.stringify({ error }),
+						body: JSON.stringify(res),
 					};
 				});
 		}
