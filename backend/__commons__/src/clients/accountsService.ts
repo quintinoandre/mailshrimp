@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import microservicesAuth from '@auth/microservicesAuth';
+import microservicesAuth from '../api/auth/microservicesAuth';
 
 const { ACCOUNTS_API } = process.env;
 

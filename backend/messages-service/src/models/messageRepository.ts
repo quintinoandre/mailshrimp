@@ -54,6 +54,12 @@ async function set(messageId: number, message: IMessage, accountId: number) {
 	if (newMessage.body && newMessage.body !== originalMessage.body)
 		originalMessage.body = newMessage.body;
 
+	if (
+		newMessage.accountEmailId &&
+		newMessage.accountEmailId !== originalMessage.accountEmailId
+	)
+		originalMessage.accountEmailId = newMessage.accountEmailId;
+
 	if (newMessage.status && newMessage.status !== originalMessage.status)
 		originalMessage.status = newMessage.status;
 

@@ -3,10 +3,10 @@ import fs from 'fs';
 import jwt from 'jsonwebtoken';
 import path from 'path';
 
-import authCommons, { Token } from '@ms-commons/api/auth';
+import accountsAuth, { Token } from '@ms-commons/api/auth/accountsAuth';
 
 const privateKey = fs.readFileSync(
-	path.join(authCommons.findKeysPath(__dirname), 'private.key'),
+	path.join(accountsAuth.findKeysPath(__dirname), 'private.key'),
 	'utf8'
 );
 
@@ -32,7 +32,7 @@ function sign(accountId: number) {
 }
 
 async function verify(token: string) {
-	return authCommons.verify(token);
+	return accountsAuth.verify(token);
 }
 
 export { hashPassword, comparePassword, sign, verify };

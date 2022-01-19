@@ -338,7 +338,12 @@ async function getAccountEmails(_req: Request, res: Response, _next: any) {
 
 		const settings = await emailService.getEmailSettings(emails);
 
-		return res.status(200).json(settings); //* OK
+		accountEmails.forEach((item) => {
+			// eslint-disable-next-line no-param-reassign
+			item.settings = settings.find((s) => s.email === item.email);
+		});
+
+		return res.status(200).json(accountEmails); //* OK
 	} catch (error) {
 		console.error(`getAccountsEmails: ${error}`);
 
