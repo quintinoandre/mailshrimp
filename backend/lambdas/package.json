@@ -1,0 +1,27 @@
+{
+	"name": "lambdas",
+	"version": "1.0.0",
+	"description": "",
+	"main": "handler.js",
+	"directories": {
+		"lib": "lib"
+	},
+	"scripts": {
+		"lint": "eslint ./",
+		"lintFix": "eslint ./ --fix",
+		"format": "prettier --write \"**/*.{js,json,md,yml}\"",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"devDependencies": {
+		"eslint": "^8.7.0",
+		"eslint-config-airbnb-base": "^15.0.0",
+		"eslint-config-prettier": "^8.3.0",
+		"eslint-plugin-import": "^2.25.4",
+		"eslint-plugin-import-helpers": "^1.2.1",
+		"eslint-plugin-prettier": "^4.0.0",
+		"prettier": "^2.5.1"
+	}
+}
