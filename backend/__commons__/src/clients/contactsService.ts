@@ -6,6 +6,7 @@ const { CONTACTS_API } = process.env;
 
 interface IContact {
 	id: number;
+	email: string;
 }
 
 async function getContacts(jwt: string) {

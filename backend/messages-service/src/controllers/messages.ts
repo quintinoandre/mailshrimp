@@ -10,6 +10,7 @@ import { Token } from '@ms-commons/api/auth/accountsAuth';
 import { getToken } from '@ms-commons/api/controllers/controller';
 import accountsService from '@ms-commons/clients/accountsService';
 import contactsService from '@ms-commons/clients/contactsService';
+import emailService from '@ms-commons/clients/emailService';
 import queueService from '@ms-commons/clients/queueService';
 
 async function getMessages({ query }: Request, res: Response, _next: any) {
@@ -266,8 +267,44 @@ async function sendMessage(
 			return res.status(404).json({ message: 'accountEmail not found!' }); //! Not Found
 
 		// ? enviar o e-mail (SES)
+		const result = await emailService.sendEmail(
+			accountEmail.name,
+			accountEmail.email,
+			contact.email,
+			message.subject,
+			message.body
+		);
+
+		if (!result.success)
+			return res
+				.status(400)
+				.json({ message: `Couldn't send the email message` }); //! Bad Request
+
+		sending.status = SendingStatus.SENT;
+
+		sending.sendDate = new Date();
+
+		await sendingRepository.set(params.id, sending, sending.accountId);
 
 		// ? atualizar a message
+		const hasMore = await sendingRepository.hasQueuedSendings(
+			sending.messageId,
+			sending.accountId
+		);
+
+		if (!hasMore) {
+			message.status = MessageStatus.SENT;
+
+			message.sendDate = new Date();
+
+			await messageRepository.set(
+				sending.messageId,
+				message,
+				sending.accountId
+			);
+		}
+
+		return res.status(202).json(sending); //* Accepted
 	} catch (error) {
 		console.error(`sendMessage: ${error}`);
 
