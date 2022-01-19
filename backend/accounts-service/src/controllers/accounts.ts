@@ -37,7 +37,8 @@ async function getAccount(
 	try {
 		const accountId = parseInt(id);
 
-		if (!accountId) return res.status(400).json({ message: 'id is required!' }); //! Bad Request
+		if (!accountId)
+			return res.status(400).json({ message: 'accountId is required!' }); //! Bad Request
 
 		const token = getToken(res) as Token;
 
@@ -89,7 +90,8 @@ async function deleteAccount(
 	try {
 		const accountId = parseInt(id);
 
-		if (!accountId) return res.status(400).json({ message: 'id is required!' }); //! Bad Request
+		if (!accountId)
+			return res.status(400).json({ message: 'accountId is required!' }); //! Bad Request
 
 		const token = getToken(res) as Token;
 
@@ -134,7 +136,7 @@ async function deleteAccount(
 			return res.status(200).json(updatedAccount); //* OK
 		}
 
-		return res.end();
+		return res.sendStatus(404); //! Not Found
 	} catch (error) {
 		console.error(`deleteAccount: ${error}`);
 
@@ -151,7 +153,7 @@ async function setAccount(req: Request, res: Response, next: any) {
 
 		const id = parseInt(req.params.id);
 
-		if (!id) return res.status(400).json({ message: 'id is required!' }); //! Bad Request
+		if (!id) return res.status(400).json({ message: 'accountId is required!' }); //! Bad Request
 
 		const { accountId } = getToken(res) as Token;
 
@@ -296,13 +298,17 @@ async function addAccountEmail({ body }: Request, res: Response, _next: any) {
 				(item) => item.email === accountEmail.email
 			);
 
-		if (alreadyExists) return res.sendStatus(400); //! Bad Request
+		if (alreadyExists)
+			return res.status(400).json({ message: 'accountEmail already exists!' }); //! Bad Request
 
 		accountEmail.accountId = accountId;
 
 		const { id } = await accountEmailRepository.add(accountEmail);
 
-		if (!id) return res.sendStatus(400); //! Bad Request
+		if (!id)
+			return res
+				.status(400)
+				.json({ message: `Couldn't save the accountEmail!` }); //! Bad Request
 
 		accountEmail.id = id;
 
@@ -364,7 +370,9 @@ async function getAccountEmail({ params }: Request, res: Response, _next: any) {
 		const accountEmailId = parseInt(params.accountEmailId);
 
 		if (!accountId || !accountEmailId)
-			return res.status(400).json({ message: 'Both ids are required!' }); //! Bad Request
+			return res
+				.status(400)
+				.json({ message: 'Both accountId and accountEmailId  are required!' }); //! Bad Request
 
 		const accountEmail = (await accountEmailRepository.findById(
 			accountEmailId,
@@ -376,7 +384,8 @@ async function getAccountEmail({ params }: Request, res: Response, _next: any) {
 
 		const settings = await emailService.getEmailSettings([accountEmail.email]);
 
-		if (!settings || settings.length < 1) return res.sendStatus(404); //! Not Found
+		if (!settings || settings.length < 1)
+			return res.status(404).json({ message: 'Settings not found!' }); //! Not Found
 
 		// eslint-disable-next-line prefer-destructuring
 		accountEmail.settings = settings[0];
@@ -398,7 +407,7 @@ async function setAccountEmail(
 		const accountEmailId = parseInt(id);
 
 		if (!accountEmailId)
-			return res.status(400).json({ message: 'id is required!' }); //! Bad Request
+			return res.status(400).json({ message: 'accountEmailId is required!' }); //! Bad Request
 
 		const token = getToken(res) as Token;
 
@@ -429,7 +438,7 @@ async function deleteAccountEmail(
 		const accountEmailId = parseInt(id);
 
 		if (!accountEmailId)
-			return res.status(400).json({ message: 'id is required!' }); //! Bad Request
+			return res.status(400).json({ message: 'accountEmailId is required!' }); //! Bad Request
 
 		const token = getToken(res) as Token;
 

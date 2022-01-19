@@ -37,7 +37,8 @@ async function getMessage(
 	try {
 		const messageId = parseInt(id);
 
-		if (!messageId) return res.status(400).json({ message: 'id is required!' }); //! Bad Request
+		if (!messageId)
+			return res.status(400).json({ message: 'messageId is required!' }); //! Bad Request
 
 		const token = getToken(res) as Token;
 
@@ -46,8 +47,7 @@ async function getMessage(
 			token.accountId
 		);
 
-		if (!message)
-			return res.status(404).json({ message: 'Message not found!' }); //! Not Found
+		if (!message) return res.sendStatus(404); //! Not Found
 
 		return res.status(200).json(message); //* OK
 	} catch (error) {
@@ -81,7 +81,8 @@ async function setMessage(
 	try {
 		const messageId = parseInt(id);
 
-		if (!messageId) return res.status(400).json({ message: 'id is required!' }); //! Bad Request
+		if (!messageId)
+			return res.status(400).json({ message: 'messageId is required!' }); //! Bad Request
 
 		const token = getToken(res) as Token;
 
@@ -93,7 +94,7 @@ async function setMessage(
 			token.accountId
 		);
 
-		if (!result) return res.status(404).json({ message: 'Message not found!' }); //! Not Found
+		if (!result) return res.sendStatus(404); //! Not Found
 
 		return res.status(200).json(result); //* OK
 	} catch (error) {
@@ -111,7 +112,8 @@ async function deleteMessage(
 	try {
 		const messageId = parseInt(id);
 
-		if (!messageId) return res.status(400).json({ message: 'id is required!' }); //! Bad Request
+		if (!messageId)
+			return res.status(400).json({ message: 'messageId is required!' }); //! Bad Request
 
 		const token = getToken(res) as Token;
 
@@ -148,7 +150,8 @@ async function scheduleMessage(
 		// ? obter a mensagem
 		const messageId = parseInt(id);
 
-		if (!messageId) return res.status(400).json({ message: 'id is required!' }); //! Bad Request
+		if (!messageId)
+			return res.status(400).json({ message: 'messageId is required!' }); //! Bad Request
 
 		const token = getToken(res) as Token;
 

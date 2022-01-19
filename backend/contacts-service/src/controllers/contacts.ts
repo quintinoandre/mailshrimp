@@ -33,7 +33,7 @@ async function getContact({ params }: Request, res: Response, _next: any) {
 		const contactId = parseInt(params.id);
 
 		if (!contactId)
-			return res.status(400).json({ message: 'contact id is required!' }); //! Bad Request
+			return res.status(400).json({ message: 'contactId is required!' }); //! Bad Request
 
 		let accountId = parseInt(params.accountId);
 
@@ -79,7 +79,8 @@ async function setContact(
 	try {
 		const contactId = parseInt(id);
 
-		if (!contactId) return res.status(400).json({ message: 'id is required!' }); //! Bad Request
+		if (!contactId)
+			return res.status(400).json({ message: 'contactId is required!' }); //! Bad Request
 
 		const token = getToken(res) as Token;
 
@@ -89,7 +90,7 @@ async function setContact(
 
 		if (!result) return res.sendStatus(404); //! Not Found
 
-		return res.json(result); //* OK
+		return res.status(200).json(result); //* OK
 	} catch (error) {
 		console.error(`setContact: ${error}`);
 
@@ -105,7 +106,8 @@ async function deleteContact(
 	try {
 		const contactId = parseInt(id);
 
-		if (!contactId) return res.status(400).json({ message: 'id is required!' }); //! Bad Request
+		if (!contactId)
+			return res.status(400).json({ message: 'contactId is required!' }); //! Bad Request
 
 		const token = getToken(res) as Token;
 

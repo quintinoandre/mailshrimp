@@ -167,8 +167,4 @@ router.delete(
 	deleteAccountEmail
 );
 
-router.get('/health', ({ body }, res) => {
-	res.json({ name: 'accounts-service', echo: `${body}` });
-});
-
 export default router;
