@@ -8,12 +8,12 @@ import { sign } from '../src/auth';
 import { IAccount } from '../src/models/account';
 import accountRepository from '../src/models/accountRepository';
 
-const TEST_EMAIL = 'jest@accounts.auth.com';
+const TEST_EMAIL = 'jest@accounts.auth.com' as string;
 const HASH_TEST_PASSWORD =
-	'$2a$10$Ive59EREl/VkatAZYl9qF.MI5u3Db4vV/bK/pkHXgxHNUrl.CEFMu';
-const TEST_PASSWORD = '123456';
-let jwt = '';
-let testAccountId = 0;
+	'$2a$10$Ive59EREl/VkatAZYl9qF.MI5u3Db4vV/bK/pkHXgxHNUrl.CEFMu' as string;
+const TEST_PASSWORD = '123456' as string;
+let jwt = '' as string;
+let testAccountId = 0 as number;
 
 beforeAll(async () => {
 	const testAccount: IAccount = {

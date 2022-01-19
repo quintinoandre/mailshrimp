@@ -11,21 +11,21 @@ import { IAccountEmail } from '../src/models/accountEmail';
 import accountEmailRepository from '../src/models/accountEmailRepository';
 import accountRepository from '../src/models/accountRepository';
 
-let jwt: string;
-let jwt2: string;
-let testAccountId: number;
-let testAccountId2: number;
-let testAccountEmailId: number;
-let testAccountEmailId2: number;
-const TEST_EMAIL = 'jest@settings.com';
-const TEST_EMAIL2 = 'jest@settings2.com';
-const TEST_EMAIL3 = 'jest2@settings2.com';
-const TEST_EMAIL4 = 'jest3@settings2.com';
-const TEST_EMAIL5 = 'jest4@settings2.com';
-const TEST_DOMAIN = 'settings.com';
-const TEST_DOMAIN2 = 'settings2.com';
+let jwt = '' as string;
+let jwt2 = '' as string;
+let testAccountId = 0 as number;
+let testAccountId2 = 0 as number;
+let testAccountEmailId = 0 as number;
+let testAccountEmailId2 = 0 as number;
+const TEST_EMAIL = 'jest@settings.com' as string;
+const TEST_EMAIL2 = 'jest@settings2.com' as string;
+const TEST_EMAIL3 = 'jest2@settings2.com' as string;
+const TEST_EMAIL4 = 'jest3@settings2.com' as string;
+const TEST_EMAIL5 = 'jest4@settings2.com' as string;
+const TEST_DOMAIN = 'settings.com' as string;
+const TEST_DOMAIN2 = 'settings2.com' as string;
 const HASH_PASSWORD =
-	'$2a$10$Ive59EREl/VkatAZYl9qF.MI5u3Db4vV/bK/pkHXgxHNUrl.CEFMu';
+	'$2a$10$Ive59EREl/VkatAZYl9qF.MI5u3Db4vV/bK/pkHXgxHNUrl.CEFMu' as string;
 
 describe('Testing routes of accounts/settings', () => {
 	beforeAll(async () => {

@@ -9,13 +9,13 @@ import { IAccount } from '../src/models/account';
 import accountRepository from '../src/models/accountRepository';
 import { AccountStatus } from '../src/models/accountStatus';
 
-const TEST_EMAIL = 'jest@accounts.com';
-const TEST_EMAIL2 = 'jest2@accounts.com';
+const TEST_EMAIL = 'jest@accounts.com' as string;
+const TEST_EMAIL2 = 'jest2@accounts.com' as string;
 const HASH_TEST_PASSWORD =
-	'$2a$10$Ive59EREl/VkatAZYl9qF.MI5u3Db4vV/bK/pkHXgxHNUrl.CEFMu';
-const TEST_PASSWORD = '123456';
-let testId = 0;
-let jwt: string = null;
+	'$2a$10$Ive59EREl/VkatAZYl9qF.MI5u3Db4vV/bK/pkHXgxHNUrl.CEFMu' as string;
+const TEST_PASSWORD = '123456' as string;
+let testId = 0 as number;
+let jwt = null as string;
 
 beforeAll(async () => {
 	const testAccount: IAccount = {

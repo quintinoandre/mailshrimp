@@ -1,14 +1,19 @@
 import { STATUS_CODES } from 'http';
 import request from 'supertest';
+import { v4 as uuid } from 'uuid';
 
 import { describe, expect, it, beforeAll, afterAll } from '@jest/globals';
 
+import microservicesAuth from '../../__commons__/src/api/auth/microservicesAuth';
 import accountsApp from '../../accounts-service/src/app';
 import contactsApp from '../../contacts-service/src/app';
 import app from '../src/app';
 import { IMessage } from '../src/models/message';
 import messageRepository from '../src/models/messageRepository';
 import { MessageStatus } from '../src/models/messageStatus';
+import { ISending } from '../src/models/sending';
+import sendingRepository from '../src/models/sendingRepository';
+import { SendingStatus } from '../src/models/sendingStatus';
 
 const TEST_DOMAIN = 'jest.send.com' as string;
 const TEST_EMAIL = `jest@${TEST_DOMAIN}` as string;
@@ -17,6 +22,8 @@ let testAccountId = 0 as number;
 let testAccountEmailId = 0 as number;
 let testMessageId = 0 as number;
 let testContactId = 0 as number;
+let testSendingId = null as string;
+let testSendingId2 = null as string;
 let jwt = null as string;
 
 beforeAll(async () => {
@@ -90,9 +97,52 @@ beforeAll(async () => {
 	console.log(`addResult: ${addResult}`);
 
 	testMessageId = addResult.id;
+
+	const testSending = {
+		accountId: testAccountId,
+		messageId: testMessageId,
+		contactId: testContactId,
+		status: SendingStatus.QUEUED,
+		id: uuid(),
+	} as ISending;
+
+	const sendingResult = await sendingRepository.add(testSending);
+
+	console.log(`sendingResult: ${sendingResult.id}`);
+
+	if (!sendingResult.id) throw new Error();
+
+	testSendingId = sendingResult.id;
+
+	const testSending2 = {
+		accountId: testAccountId,
+		messageId: testMessageId,
+		contactId: testContactId,
+		status: SendingStatus.QUEUED,
+		id: uuid(),
+	} as ISending;
+
+	const sendingResult2 = await sendingRepository.add(testSending2);
+
+	console.log(`sendingResult2: ${sendingResult2}`);
+
+	if (!sendingResult2.id) throw new Error();
+
+	testSendingId2 = sendingResult2.id;
 });
 
 afterAll(async () => {
+	const sendingResult = await sendingRepository.removeById(
+		testSendingId,
+		testAccountId
+	);
+	const sendingResult2 = await sendingRepository.removeById(
+		testSendingId2,
+		testAccountId
+	);
+
+	console.log(`sendingResult: ${sendingResult}:${sendingResult2}`);
+
 	const removeResult = await messageRepository.removeById(
 		testMessageId,
 		testAccountId
@@ -163,5 +213,28 @@ describe('Testing routes of messages', () => {
 			.set('x-access-token', jwt);
 
 		expect(status).toEqual(400);
+	});
+
+	it(`POST /messages/sending - should return statusCode 202 (${STATUS_CODES[202]})`, async () => {
+		const payload = {
+			id: testSendingId,
+			accountId: testAccountId,
+			contactId: testContactId,
+			messageId: testMessageId,
+		} as ISending;
+
+		const msJwt = await microservicesAuth.sign(payload);
+
+		const {
+			status,
+			body: { id, status: bodyStatus },
+		} = await request(app)
+			.post('/messages/sending')
+			.set('x-access-token', `${msJwt}`)
+			.send(payload);
+
+		expect(status).toEqual(202);
+		expect(id).toEqual(testSendingId);
+		expect(bodyStatus).toEqual(SendingStatus.SENT);
 	});
 });

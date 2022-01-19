@@ -207,6 +207,16 @@ async function sendEmail(
 	subject: string,
 	body: string
 ) {
+	// mock (caseiro) para teste
+	/* if (fromAddress === 'jest@jest.send.com')
+		return {
+			success: true,
+			messageId: '1',
+		} as SendEmailResponse; */
+	// ou
+	/* if (fromAddress === 'jest@jest.send.com')
+		fromAddress = 'contato@luiztools.com.br'; */
+
 	if (!canSendEmail(fromAddress))
 		return { success: false } as SendEmailResponse;
 

@@ -9,12 +9,12 @@ import { IContact } from '../src/models/contact';
 import { add, removeByEmail } from '../src/models/contactRepository';
 import { ContactStatus } from '../src/models/contactStatus';
 
-const TEST_EMAIL = 'jest@accounts.com';
-const TEST_EMAIL2 = 'jest2@accounts.com';
-const TEST_PASSWORD = '123456';
-let testAccountId = 0;
-let testContactId = 0;
-let jwt: string = null;
+const TEST_EMAIL = 'jest@accounts.com' as string;
+const TEST_EMAIL2 = 'jest2@accounts.com' as string;
+const TEST_PASSWORD = '123456' as string;
+let testAccountId = 0 as number;
+let testContactId = 0 as number;
+let jwt = null as string;
 
 beforeAll(async () => {
 	const testAccount = {
