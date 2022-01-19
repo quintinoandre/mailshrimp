@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import microservicesAuth from '../api/auth/microservicesAuth';
+import microservicesAuth from '@auth/microservicesAuth';
 
 const { CONTACTS_API } = process.env;
 
@@ -53,4 +53,4 @@ async function getContact(contactId: number, accountId: number) {
 	}
 }
 
-export { getContacts, getContact };
+export default { getContacts, getContact };

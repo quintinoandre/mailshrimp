@@ -14,6 +14,7 @@ import { getToken } from '@ms-commons/api/controllers/controller';
 import {
 	validateSchema,
 	validateAccountAuth,
+	validateMicroserviceAuth,
 } from '@ms-commons/api/routes/middlewares';
 
 function validateAccountEmailSchema(req: Request, res: Response, next: any) {
@@ -44,6 +45,14 @@ async function validateAuthentication(req: Request, res: Response, next: any) {
 	return validateAccountAuth(req, res, next);
 }
 
+async function validateMSAuthentication(
+	req: Request,
+	res: Response,
+	next: any
+) {
+	return validateMicroserviceAuth(req, res, next);
+}
+
 function validateAuthorization(
 	{ params: { id } }: Request,
 	res: Response,
@@ -67,5 +76,6 @@ export {
 	validateUpdateAccountSchema,
 	validateLoginSchema,
 	validateAuthentication,
+	validateMSAuthentication,
 	validateAuthorization,
 };

@@ -8,7 +8,8 @@ import sendingRepository from '@models/sendingRepository';
 import { SendingStatus } from '@models/sendingStatus';
 import { Token } from '@ms-commons/api/auth/accountsAuth';
 import { getToken } from '@ms-commons/api/controllers/controller';
-import { getContact, getContacts } from '@ms-commons/clients/contactsService';
+import accountsService from '@ms-commons/clients/accountsService';
+import contactsService from '@ms-commons/clients/contactsService';
 import queueService from '@ms-commons/clients/queueService';
 
 async function getMessages({ query }: Request, res: Response, _next: any) {
@@ -158,7 +159,7 @@ async function scheduleMessage(
 		if (!message) return res.sendStatus(403); //! Forbidden
 
 		// ? obter os contactos
-		const contacts = await getContacts(token.jwt);
+		const contacts = await contactsService.getContacts(token.jwt);
 
 		if (!contacts || contacts.length < 1)
 			return res
@@ -247,12 +248,22 @@ async function sendMessage(
 			return res.status(404).json({ message: 'Message not found!' }); //! Not Found
 
 		// ? obter o contacto (destinatário)
-		const contact = await getContact(sending.contactId, sending.accountId);
+		const contact = await contactsService.getContact(
+			sending.contactId,
+			sending.accountId
+		);
 
 		if (!contact)
 			return res.status(404).json({ message: 'Contact not found!' }); //! Not Found
 
 		// ? obter o accountEmail (remetente)
+		const accountEmail = await accountsService.getAccountEmail(
+			sending.accountId,
+			message.accountEmailId
+		);
+
+		if (!accountEmail)
+			return res.status(404).json({ message: 'accountEmail not found!' }); //! Not Found
 
 		// ? enviar o e-mail (SES)
 

@@ -58,7 +58,8 @@ router.patch(
 
 /**
  * DELETE /messages/:id
- * Remove one message from this account
+ * Soft-delete one message from this account
+ * ?force=true to really remove
  */
 router.delete('/messages/:id', validateAccountAuth, deleteMessage);
 
