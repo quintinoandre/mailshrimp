@@ -232,6 +232,15 @@ async function getAccountSettings(_req: Request, res: Response, _next: any) {
 
 		const settings = await emailService.getAccountSettings(domain, emails);
 
+		settings.EmailAddress.forEach((item) => {
+			const accountEmail = accountEmails.find((ae) => ae.email === item.email);
+
+			if (!accountEmail) return;
+
+			item.id = accountEmail.id;
+
+			item.name = accountEmail.name;
+		});
 		return res.status(200).json(settings); //* OK
 	} catch (error) {
 		console.error(`getAccountSettings: ${error}`);

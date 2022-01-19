@@ -6,7 +6,12 @@ const { AWS_SES_REGION } = process.env;
 
 AWS.config.update({ region: AWS_SES_REGION });
 
-export type EmailSetting = { email: string; verified: boolean };
+export type EmailSetting = {
+	email: string;
+	verified: boolean;
+	name?: string;
+	id?: number;
+};
 
 export type DnsRecord = {
 	type: string;
