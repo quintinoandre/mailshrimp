@@ -32,8 +32,6 @@ const Contact = database.define<IContactModel>(
 	{ indexes: [{ unique: true, fields: ['accountId', 'email'] }] }
 );
 
-Contact.sync();
-
 export { IContactModel };
 
 export default Contact;
