@@ -27,11 +27,18 @@ provider:
         STAGE: ${self:provider.stage}
         PROJECT: ${self:service}
 
+plugins:
+  - serverless-layers
+
+custom:
+  - serverless-layers:
+      dependenciesPath: ./package.json
+
 functions:
   send-message:
   name: ${opt:stage, self:provider.stage}-${self:service}-send-message
   description: 'Send the e-mail'
-  handler: src/handlers/send-message/handler.sendMessage
+  handler: src/handlers/send-message/index.sendMessage
   memorySize: 128
   timeout: 60
   events:

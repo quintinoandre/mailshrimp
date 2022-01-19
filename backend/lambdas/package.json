@@ -22,6 +22,11 @@
 		"eslint-plugin-import": "^2.25.4",
 		"eslint-plugin-import-helpers": "^1.2.1",
 		"eslint-plugin-prettier": "^4.0.0",
-		"prettier": "^2.5.1"
+		"prettier": "^2.5.1",
+		"serverless-layers": "^2.5.1"
+	},
+	"dependencies": {
+		"jsonwebtoken": "^8.5.1",
+		"request": "^2.88.2"
 	}
 }
