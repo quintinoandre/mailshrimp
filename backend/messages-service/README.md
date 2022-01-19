@@ -23,3 +23,7 @@ Service responsible to manage messages, schedule and send them.
 9. Run in dev mode with 'npm run dev' to make your manual tests
 
 10. Run the microservice as prod with 'npm start'
+
+## Docs
+
+In the routes/messages.ts file you'll find docs about each endpoint

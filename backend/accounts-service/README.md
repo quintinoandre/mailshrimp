@@ -21,3 +21,7 @@ Service responsible to manage accounts, account authentication, account settings
 8. Run in dev mode with 'npm run dev' to make your manual tests
 
 9. Run the microservice as prod with 'npm start'
+
+## Docs
+
+In the routes/accounts.ts file you'll find docs about each endpoint.
