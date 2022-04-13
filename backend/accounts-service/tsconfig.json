@@ -24,5 +24,8 @@
 		}
 	},
 	"include": ["src/**/*"],
-	"exclude": ["__tests__"]
+	"exclude": ["__tests__"],
+  "ts-node": {
+    "transpileOnly": true
+  }
 }
